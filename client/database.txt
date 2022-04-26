@@ -1,0 +1,34 @@
+When they search it will have list of restaurants 
+from axios call to api, but these won't be stored
+
+Only store in database when user posts to it
+
+Restaurants (Only store ones that have posts)
+id: uuid // from api
+Name: String
+Description: String
+Location: coordinate obj
+
+Images
+id: uuid
+description: String
+userPosted: String
+comments: String
+type: String
+restaurant: id
+
+Users
+id: uuid
+Name: String
+password: firebase will handle
+email: String
+posts(images): [id, id, id]
+Location: coordinate obj
+
+--------------------------------------------
+
+How to handle search by Location:
+
+compare user location or searched location 
+within certain radius of coordinate
+
