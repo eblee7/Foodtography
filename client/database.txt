@@ -4,22 +4,22 @@ from axios call to api, but these won't be stored
 Only store in database when user posts to it
 
 Restaurants (Only store ones that have posts)
-id: uuid // from api
+_id: uuid // from api
 Name: String
 Description: String
 Location: coordinate obj
 
-Images
-id: uuid
+ImagesPost
+_id: uuid
 description: String
-userPosted: String
+user: String
 comments: String
-type: String
-restaurant: id
+food: Bool
+rid: id
 
 Users
-id: uuid
-Name: String
+_id: uuid
+userName: String
 password: firebase will handle
 email: String
 posts(images): [id, id, id]
