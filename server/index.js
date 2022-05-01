@@ -17,8 +17,6 @@ const usersCollection = mongoCollections.users;
 /* <input> location </input> -> shoot to mutation query -> places api (url+ location) return {lat: x lng: x} -> nearby api (url + lat + lng + type (restaurant )) return { restaurants}
 -> sent to the front end and displayed  */
 
-const apiKey = "AIzaSyCvmmeFmISNHf_GFUzKOL12SG1emy5D8Ss";
-
 //Create the type definitions for the query and our data
 const typeDefs = gql`
     type Query {
