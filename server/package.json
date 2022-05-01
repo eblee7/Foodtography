@@ -20,12 +20,13 @@
     "dependencies": {
         "apollo-server": "^2.18.2",
         "axios": "^0.23.0",
+        "bluebird": "^3.4.7",
+        "dotenv": "^16.0.0",
+        "flat": "^5.0.2",
         "graphql": "^15.0.0",
         "mongodb": "^3.5.7",
-        "uuid": "^8.0.0",
-        "bluebird": "^3.4.7",
-        "flat": "^5.0.2",
         "node-redis": "^0.1.7",
-        "redis": "^3.0.2"
+        "redis": "^3.0.2",
+        "uuid": "^8.0.0"
     }
 }

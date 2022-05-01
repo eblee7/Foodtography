@@ -5,6 +5,7 @@ const redis = require("redis");
 const bluebird = require("bluebird");
 const client = redis.createClient();
 const axios = require("axios");
+require("dotenv").config();
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
@@ -16,6 +17,8 @@ const usersCollection = mongoCollections.users;
 
 /* <input> location </input> -> shoot to mutation query -> places api (url+ location) return {lat: x lng: x} -> nearby api (url + lat + lng + type (restaurant )) return { restaurants}
 -> sent to the front end and displayed  */
+
+const apiKey = process.env.GOOGLE_API_KEY;
 
 //Create the type definitions for the query and our data
 const typeDefs = gql`
