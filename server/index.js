@@ -27,8 +27,8 @@ const typeDefs = gql`
         restaurantsNearby(address: String!): [Restaurant]
         restaurants: [Restaurant]
         images: [ImagePost]
-        restaurantImages(rid: ID): [ImagePost]
-        userImages(userID: ID): [ImagePost]
+        restaurantImages(rid: ID!): [ImagePost]
+        userImages(userID: ID!): [ImagePost]
     }
 
     type ImagePost {
@@ -51,7 +51,6 @@ const typeDefs = gql`
         userName: String!
         password: String!
         email: String!
-        location: Location
     }
 
     type Location {

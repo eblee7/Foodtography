@@ -1,6 +1,6 @@
 import React from "react";
-const Home = () => {
+const SignUp = () => {
     return <></>;
 };
 
-export default Home;
+export default SignUp;

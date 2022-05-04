@@ -1,6 +1,6 @@
 import React from "react";
-const Home = () => {
+const Image = () => {
     return <></>;
 };
 
-export default Home;
+export default Image;
