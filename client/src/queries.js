@@ -14,12 +14,17 @@ const GET_USERS = gql`
 const GET_RESTAURANTS_NEARBY = gql`
     query GetRestaurantsNearby($address: String!) {
         restaurantsNearby(address: $address) {
-            id
-            url
-            posterName
-            description
-            userPosted
-            binned
+            address
+            nearest {
+                _id
+                name
+                url
+                location {
+                    vicinity
+                    latitude
+                    longitude
+                }
+            }
         }
     }
 `;
@@ -29,7 +34,10 @@ const GET_RESTAURANTS = gql`
         restaurants {
             _id
             name
-            location
+            location {
+                latitude
+                longitude
+            }
         }
     }
 `;
@@ -56,7 +64,10 @@ const GET_RESTAURANT_IMAGES = gql`
         restaurantImages(rid: $rid) {
             _id
             name
-            location
+            location {
+                latitude
+                longitude
+            }
         }
     }
 `;

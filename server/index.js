@@ -22,10 +22,16 @@ const apiKey = process.env.GOOGLE_API_KEY;
 
 //Create the type definitions for the query and our data
 const typeDefs = gql`
+    type File {
+        filename: String!
+        mimetype: String!
+        encoding: String!
+    }
+
     type Query {
         users: [User]
-        restaurantsNearby(address: String!): [Restaurant]
-        restaurants: [Restaurant]
+        restaurantsNearby(address: String!): Nearby
+        restaurants(rid: ID!): Restaurant
         images: [ImagePost]
         restaurantImages(rid: ID!): [ImagePost]
         userImages(userID: ID!): [ImagePost]
@@ -54,6 +60,7 @@ const typeDefs = gql`
     }
 
     type Location {
+        vicinity: String!
         latitude: Float!
         longitude: Float!
     }
@@ -61,12 +68,23 @@ const typeDefs = gql`
     type Restaurant {
         _id: ID!
         name: String!
+        url: String!
         location: Location!
+    }
+
+    type Details {
+        name: String!
+        location: Location!
+    }
+
+    type Nearby {
+        address: String!
+        nearest: [Restaurant]
     }
 
     type Mutation {
         uploadImage(
-            url: String!
+            file: Upload!
             food: Boolean!
             description: String
             rid: ID
@@ -96,10 +114,36 @@ const resolvers = {
             const allUsers = await users.find({}).toArray();
             return allUsers;
         },
-        restaurants: async () => {
-            const restaurants = await restaurantsCollection();
-            const allrestaurants = await restaurants.find({}).toArray();
-            return allrestaurants;
+        restaurants: async (_, args) => {
+            let place_id = args.rid;
+            let exist = await client.existsAsync(args.rid + "Details");
+            if (exist) {
+                let placeDetailsJSON = await client.getAsync(
+                    args.rid + "Details"
+                );
+                return JSON.parse(placeDetailsJSON);
+            } else {
+                try {
+                    var config = {
+                        method: "get",
+                        url: `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id}&key=${apiKey}`,
+                        headers: {},
+                    };
+                    let { data } = await axios(config);
+                    return {
+                        name: data.results.name,
+                        location: {
+                            vicinity: data.results.formatted_address,
+                            latitude: data.results.location.geometry.lat,
+                            longitude: data.results.location.geometry.lng,
+                        },
+                    };
+                } catch (e) {
+                    throw {
+                        error: e,
+                    };
+                }
+            }
         },
         images: async () => {
             const images = await imagesCollection();
@@ -119,6 +163,9 @@ const resolvers = {
             return allimages;
         },
         restaurantsNearby: async (_, args) => {
+            if (!args.address) {
+                throw "No Address Provided";
+            }
             var config = {
                 method: "get",
                 url: `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${args.address}&inputtype=textquery&fields=formatted_address%2Cplace_id%2Cname%2Cgeometry&key=${apiKey}`,
@@ -126,25 +173,81 @@ const resolvers = {
             };
             try {
                 let response = await axios(config);
+                if (response.data.candidates.length === 0) {
+                    throw "Not Found";
+                }
                 let data = response.data.candidates[0];
-                config.url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?&location=${data.geometry.location.lat}%2C${data.geometry.location.lng}&radius=1500&type=restaurant&key=${apiKey}`;
-                response = await axios(config);
-                data = response.data.results;
-                console.log(data);
-                let places = data.map((place) => {
+                let addressVicinity = data.formatted_address;
+                let exists = await client.existsAsync(data.place_id + "NearBy");
+                if (exists) {
+                    console.log("redis!");
+                    const nearbyPlacesJSON = await client.getAsync(
+                        data.place_id + "NearBy"
+                    );
+                    let nearbyPlaces = JSON.parse(nearbyPlacesJSON);
                     return {
-                        _id: place.place_id,
-                        name: place.name,
-                        location: {
-                            latitude: place.geometry.location.lat,
-                            longitude: place.geometry.location.lng,
-                        },
+                        address: addressVicinity,
+                        nearest: nearbyPlaces,
                     };
-                });
-                console.log(places);
-                return places;
+                } else {
+                    config.url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?&location=${data.geometry.location.lat}%2C${data.geometry.location.lng}&radius=1500&type=restaurant&key=${apiKey}`;
+                    response = await axios(config);
+                    nearbyData = response.data.results;
+                    let places = nearbyData.map((place) => {
+                        return {
+                            _id: place.place_id,
+                            name: place.name,
+                            location: {
+                                vicinity: place.vicinity,
+                                latitude: place.geometry.location.lat,
+                                longitude: place.geometry.location.lng,
+                            },
+                        };
+                    });
+                    for (let i = 0; i < nearbyData.length; i++) {
+                        let reference = nearbyData[i].photos[0].photo_reference;
+                        // mongo to check to see if this id is in the res collection and has the url if it doesnt then u make the call and store
+                        const restaurants = await restaurantsCollection();
+                        const restaurantResult = await restaurants.findOne({
+                            _id: nearbyData[i].place_id,
+                        });
+                        if (restaurantResult === null) {
+                            config.url = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${reference}&key=${apiKey}`;
+                            let photoData = await axios(config);
+                            places[i].url = photoData.request.res.responseUrl;
+                            const newRestaurant = {
+                                _id: places[i]._id,
+                                url: places[i].url,
+                            };
+                            await restaurants.insertOne(newRestaurant);
+                        } else {
+                            console.log("from mongo");
+                            places[i].url = restaurantResult.url;
+                        }
+                    }
+                    let searchResults = {
+                        address: addressVicinity,
+                        nearest: places,
+                    };
+                    await client.setAsync(
+                        data.place_id + "NearBy",
+                        JSON.stringify(places)
+                    );
+                    return searchResults;
+                }
+
+                // copy data here when not using api
+
+                // let searchResults = {
+                //     address: addressVicinity,
+                //     nearest: data,
+                // };
+                // return searchResults;
             } catch (e) {
-                return [];
+                console.log(e);
+                throw {
+                    error: e,
+                };
             }
         },
     },
@@ -163,9 +266,18 @@ const resolvers = {
         },
         uploadImage: async (_, args) => {
             const images = await imagesCollection();
+            let file = await args.file;
+            console.log(file);
+            const stream = file.createReadStream();
+            const out = require("fs").createWriteStream(
+                "local-file-output.txt"
+            );
+            stream.pipe(out);
+            await finished(out);
+
             const newImage = {
                 _id: uuid.v4(),
-                url: args.url,
+                url: "url",
                 food: args.food,
                 description: args.description,
                 userID: args.userID,
