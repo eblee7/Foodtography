@@ -5,10 +5,53 @@ const redis = require("redis");
 const bluebird = require("bluebird");
 const client = redis.createClient();
 const axios = require("axios");
+const AWS = require("aws-sdk");
 require("dotenv").config();
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
+
+AWS.config.update({
+    accessKeyId: process.env.AWS_ACCESS_ID,
+    secretAccessKey: process.env.AWS_SECRET_KEY,
+    region: process.env.AWS_REGION,
+});
+
+const s3 = new AWS.S3({ region: process.env.AWS_REGION });
+const s3DefaultParams = {
+    Bucket: process.env.S3_BUCKET_NAME,
+    Conditions: [
+        ["content-length-range", 0, 1024000], // 1 Mb
+    ],
+};
+const handleFileUpload = async (file) => {
+    console.log(file);
+    const { createReadStream, filename } = await file;
+    console.log(createReadStream, filename);
+
+    const key = uuid.v4();
+
+    // image magick stuff
+
+    return new Promise((resolve, reject) => {
+        s3.upload(
+            {
+                ...s3DefaultParams,
+                Body: createReadStream(),
+                Key: `images/${key}${filename}`,
+            },
+            (err, data) => {
+                if (err) {
+                    console.log("error uploading...", err);
+                    reject(err);
+                } else {
+                    console.log("successfully uploaded file...", data);
+                    resolve(data);
+                }
+            }
+        );
+    });
+};
 
 //Some Mock Data
 const restaurantsCollection = mongoCollections.restaurants;
@@ -31,10 +74,10 @@ const typeDefs = gql`
     type Query {
         users: [User]
         restaurantsNearby(address: String!): Nearby
-        restaurants(rid: ID!): Restaurant
-        images: [ImagePost]
-        restaurantImages(rid: ID!): [ImagePost]
+        restaurant(rid: ID!): Restaurant
+        restaurantImages(rid: ID!, food: Boolean!): [ImagePost]
         userImages(userID: ID!): [ImagePost]
+        image(imageID: ID!): ImagePost
     }
 
     type ImagePost {
@@ -43,12 +86,12 @@ const typeDefs = gql`
         description: String
         food: Boolean!
         rid: ID!
-        userID: ID!
+        userName: String!
         comments: [Comment]
     }
 
     type Comment {
-        userID: ID!
+        userName: String!
         comment: String!
     }
 
@@ -57,12 +100,20 @@ const typeDefs = gql`
         userName: String!
         password: String!
         email: String!
+        posts: [ImagePost]
     }
 
     type Location {
         vicinity: String!
         latitude: Float!
         longitude: Float!
+    }
+
+    type S3Object {
+        ETag: String
+        Location: String!
+        Key: String!
+        Bucket: String!
     }
 
     type Restaurant {
@@ -87,8 +138,8 @@ const typeDefs = gql`
             file: Upload!
             food: Boolean!
             description: String
-            rid: ID
-            userID: ID
+            rid: ID!
+            userName: String!
         ): ImagePost
         addUser(userName: String!, password: String!, email: String!): User
         addComment(userID: ID!, imageID: ID!, comment: String!): Comment
@@ -112,9 +163,10 @@ const resolvers = {
         users: async () => {
             const users = await usersCollection();
             const allUsers = await users.find({}).toArray();
+            if (!allUsers) throw "Could not get all users";
             return allUsers;
         },
-        restaurants: async (_, args) => {
+        restaurant: async (_, args) => {
             let place_id = args.rid;
             let exist = await client.existsAsync(args.rid + "Details");
             if (exist) {
@@ -145,22 +197,42 @@ const resolvers = {
                 }
             }
         },
-        images: async () => {
-            const images = await imagesCollection();
-            const allimages = await images.find({}).toArray();
-            return allimages;
-        },
         restaurantImages: async (_, args) => {
-            const images = await imagesCollection();
-            const allimages = await images.find({ rid: args.rid }).toArray();
-            return allimages;
+            let food = args.food ? "food" : "atmosphere";
+            let exists = await client.existsAsync(args.rid + food);
+            if (exists) {
+                let imagesJSON = await client.getAsync(args.rid + food);
+                let images = JSON.parse(imagesJSON);
+                return images;
+            } else {
+                const images = await imagesCollection();
+                const allimages = await images
+                    .find({ rid: args.rid, food: args.food })
+                    .toArray();
+                if (!allimages) throw "Could not get restaurant images";
+                if (allimages.length > 0) {
+                    await client.setAsync(args.rid + food);
+                }
+                return allimages;
+            }
         },
         userImages: async (_, args) => {
-            const images = await imagesCollection();
-            const allimages = await images
-                .find({ userID: args.userID })
-                .toArray();
-            return allimages;
+            let exists = await client.existsAsync(args.userID + "user");
+            if (exists) {
+                let imagesJSON = await client.getAsync(args.userID + "user");
+                let images = JSON.parse(imagesJSON);
+                return images;
+            } else {
+                const images = await imagesCollection();
+                const allimages = await images
+                    .find({ userID: args.userID })
+                    .toArray();
+                if (!allimages) throw "Could not get user images";
+                if (allimages.length > 0) {
+                    await client.setAsync(args.userID + "user");
+                }
+                return allimages;
+            }
         },
         restaurantsNearby: async (_, args) => {
             if (!args.address) {
@@ -173,6 +245,7 @@ const resolvers = {
             };
             try {
                 let response = await axios(config);
+                console.log("axios1");
                 if (response.data.candidates.length === 0) {
                     throw "Not Found";
                 }
@@ -192,6 +265,7 @@ const resolvers = {
                 } else {
                     config.url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?&location=${data.geometry.location.lat}%2C${data.geometry.location.lng}&radius=1500&type=restaurant&key=${apiKey}`;
                     response = await axios(config);
+                    console.log("axios2");
                     nearbyData = response.data.results;
                     let places = nearbyData.map((place) => {
                         return {
@@ -214,6 +288,7 @@ const resolvers = {
                         if (restaurantResult === null) {
                             config.url = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${reference}&key=${apiKey}`;
                             let photoData = await axios(config);
+                            console.log("axios3");
                             places[i].url = photoData.request.res.responseUrl;
                             const newRestaurant = {
                                 _id: places[i]._id,
@@ -250,6 +325,22 @@ const resolvers = {
                 };
             }
         },
+        image: async (_, args) => {
+            let exists = await client.existsAsync(args.imageID + "image");
+            if (exists) {
+                let imageJSON = await client.getAsync(args.imageID + "image");
+                let image = JSON.parse(imageJSON);
+                return image;
+            } else {
+                const images = await imagesCollection();
+                const image = await images.findOne({ _id: args.imageID });
+                if (image === null) {
+                    throw "Image not found";
+                }
+                await client.setAsync(args.imageID + "image");
+                return image;
+            }
+        },
     },
     Mutation: {
         addUser: async (_, args) => {
@@ -261,26 +352,24 @@ const resolvers = {
                 email: args.email,
                 posts: [],
             };
-            await users.insertOne(newUser);
+            const insertInfo = await users.insertOne(newUser);
+            if (!insertInfo.acknowledged || !insertInfo.insertedId)
+                throw "Could not add user";
             return newUser;
         },
         uploadImage: async (_, args) => {
+            const response = await handleFileUpload(args.file);
+
+            console.log(response.Location);
+
             const images = await imagesCollection();
-            let file = await args.file;
-            console.log(file);
-            const stream = file.createReadStream();
-            const out = require("fs").createWriteStream(
-                "local-file-output.txt"
-            );
-            stream.pipe(out);
-            await finished(out);
 
             const newImage = {
                 _id: uuid.v4(),
-                url: "url",
+                url: response.Location,
                 food: args.food,
                 description: args.description,
-                userID: args.userID,
+                userName: args.userName,
                 rid: args.rid,
                 comments: [],
             };
@@ -290,13 +379,16 @@ const resolvers = {
         addComment: async (_, args) => {
             const images = await imagesCollection();
             const newComment = {
-                userID: args.userID,
+                userName: args.userName,
                 comment: args.comment,
             };
-            await images.updateOne(
+            const updatedInfo = await images.updateOne(
                 { _id: args.imageID },
                 { $push: { comments: newComment } }
             );
+            if (updatedInfo.modifiedCount === 0) {
+                throw "could not add comment successfully";
+            }
             return newComment;
         },
     },

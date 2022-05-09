@@ -66,7 +66,7 @@ function App() {
                             /> */}
                             <Route path="/image/:id" element={<Image />} />
                             <Route
-                                path="/restaurant/"
+                                path="/restaurants/:address"
                                 element={<RestaurantList />}
                             />
                             <Route
