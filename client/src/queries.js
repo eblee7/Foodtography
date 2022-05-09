@@ -29,12 +29,13 @@ const GET_RESTAURANTS_NEARBY = gql`
     }
 `;
 
-const GET_RESTAURANTS = gql`
-    query {
-        restaurants {
+const GET_RESTAURANT = gql`
+    query GetRestaurant($rid: ID!) {
+        restaurants(rid: $rid) {
             _id
             name
             location {
+                vicinity
                 latitude
                 longitude
             }
@@ -42,17 +43,17 @@ const GET_RESTAURANTS = gql`
     }
 `;
 
-const GET_IMAGES = gql`
-    query {
-        images {
+const GET_IMAGE = gql`
+    query GetImage($imageID: ID!) {
+        images(imageID: $imageID) {
             _id
             url
             description
             food
             rid
-            userID
+            userName
             comments {
-                userID
+                userName
                 comment
             }
         }
@@ -60,13 +61,17 @@ const GET_IMAGES = gql`
 `;
 
 const GET_RESTAURANT_IMAGES = gql`
-    query GetRestaurantImages($rid: ID!) {
-        restaurantImages(rid: $rid) {
+    query GetRestaurantImages($rid: ID!, $food: Boolean!) {
+        restaurantImages(rid: $rid, food: $food) {
             _id
-            name
-            location {
-                latitude
-                longitude
+            url
+            description
+            food
+            rid
+            userName
+            comments {
+                userName
+                comment
             }
         }
     }
@@ -80,9 +85,9 @@ const GET_USER_IMAGES = gql`
             description
             food
             rid
-            userID
+            userName
             comments {
-                userID
+                userName
                 comment
             }
         }
@@ -139,8 +144,8 @@ const ADD_COMMENT = gql`
 let exported = {
     GET_USERS,
     GET_RESTAURANTS_NEARBY,
-    GET_RESTAURANTS,
-    GET_IMAGES,
+    GET_RESTAURANT,
+    GET_IMAGE,
     GET_RESTAURANT_IMAGES,
     GET_USER_IMAGES,
     UPLOAD_IMAGE,

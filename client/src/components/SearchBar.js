@@ -13,11 +13,7 @@ const SearchBar = () => {
                     onSubmit={(e) => {
                         e.preventDefault();
                         console.log(formAddress.value);
-                        navigate("restaurant", {
-                            state: {
-                                address: formAddress.value,
-                            },
-                        });
+                        navigate(`restaurants/${formAddress.value}`);
                         formAddress.value = "";
                     }}
                 >
