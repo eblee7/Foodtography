@@ -32,3 +32,39 @@ How to handle search by Location:
 compare user location or searched location 
 within certain radius of coordinate
 
+
+MongoDB 
+-Users
+    _id: uuid
+    userName: String
+    password: firebase will handle
+    email: String
+    posts(images): [id, id, id]
+    Location: coordinate obj
+
+-ImagePost
+    _id: uuid
+    description: String
+    user: String
+    type: String 
+    comments: String
+    food: Bool
+    rid: id
+
+-Restaurants
+    -rid
+    -url (Google API)
+
+Redis
+    - redis Set key(Location that we enter placeId + "Nearby"), value (Nearby restaurant) /restaurant/nearby/placeID
+    - key (placeID+"Details")  value (res details) /restaurant/id (res details )
+
+Redux/Location 
+     XXXX NO
+
+
+TODO
+    ->Mongo collection FIX
+    ->Queries change
+    ->REDIS 
+    -> change url 

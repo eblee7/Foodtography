@@ -1,5 +1,5 @@
 import React from "react";
-const Image = () => {
+const Image = ({ restaurantName }) => {
     return <></>;
 };
 
