@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import ReactModal from "react-modal";
 import { useQuery, useMutation } from "@apollo/client";
 //Import the file where my query constants are defined
@@ -23,20 +22,23 @@ const customStyles = {
 };
 
 function UploadModal(props) {
-    const { id } = useParams;
-    const [food, setFood] = useState(false);
     const [showhandleCloseUploadModal, setShowhandleCloseUploadModal] =
         useState(props.isOpen);
 
-    if (props.type == food) {
-        setFood(true);
-    }
+    let food = props.type === "food" ? true : false;
+
     const [uploadImage] = useMutation(queries.UPLOAD_IMAGE, {
         update(cache, { data: { uploadImage } }) {
-            const { images } = cache.readQuery({ query: queries.GET_IMAGES });
+            const { restaurantImages } = cache.readQuery({
+                query: queries.GET_RESTAURANT_IMAGES,
+                variables: { rid: props.rid, food },
+            });
             cache.writeQuery({
-                query: queries.GET_IMAGES,
-                data: { images: images.concat([uploadImage]) },
+                query: queries.GET_RESTAURANT_IMAGES,
+                data: {
+                    restaurantImages: restaurantImages.concat([uploadImage]),
+                },
+                variables: { rid: props.rid, food },
             });
         },
     });
@@ -62,24 +64,24 @@ function UploadModal(props) {
 
     let body = null;
     let imageDescription;
-    let url;
-    let userId;
+    let file;
+    let userName;
     body = (
         <form
             onSubmit={(e) => {
                 e.preventDefault();
+                console.log(file);
                 uploadImage({
                     variables: {
-                        url: url,
+                        file: file.files[0],
                         food: food,
                         description: imageDescription.value,
-                        rid: id,
-                        userId: "Default value",
+                        rid: props.rid,
+                        userName: "Default value",
                     },
                 });
                 imageDescription.value = "";
-                url.value = "";
-                userId.value = "1";
+                // userName.value = "default";
                 setShowhandleCloseUploadModal(false);
                 alert("Image Added");
                 props.handleClose();
@@ -91,8 +93,9 @@ function UploadModal(props) {
                     <br />
                     <input
                         type="file"
+                        accept="image/jpeg, image/png, .jpeg, .jpg, .png"
                         ref={(node) => {
-                            url = node;
+                            file = node;
                         }}
                         required
                         autoFocus={true}

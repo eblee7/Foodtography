@@ -170,6 +170,7 @@ const resolvers = {
             let place_id = args.rid;
             let exist = await client.existsAsync(args.rid + "Details");
             if (exist) {
+                console.log("from redis");
                 let placeDetailsJSON = await client.getAsync(
                     args.rid + "Details"
                 );
@@ -182,15 +183,22 @@ const resolvers = {
                         headers: {},
                     };
                     let { data } = await axios(config);
-                    return {
-                        name: data.results.name,
+                    let newRestaurant = {
+                        _id: data.result.place_id,
+                        name: data.result.name,
                         location: {
-                            vicinity: data.results.formatted_address,
-                            latitude: data.results.location.geometry.lat,
-                            longitude: data.results.location.geometry.lng,
+                            vicinity: data.result.formatted_address,
+                            latitude: data.result.geometry.location.lat,
+                            longitude: data.result.geometry.location.lng,
                         },
                     };
+                    await client.setAsync(
+                        args.rid + "Details",
+                        JSON.stringify(newRestaurant)
+                    );
+                    return newRestaurant;
                 } catch (e) {
+                    console.log(e);
                     throw {
                         error: e,
                     };
@@ -198,23 +206,26 @@ const resolvers = {
             }
         },
         restaurantImages: async (_, args) => {
-            let food = args.food ? "food" : "atmosphere";
-            let exists = await client.existsAsync(args.rid + food);
-            if (exists) {
-                let imagesJSON = await client.getAsync(args.rid + food);
-                let images = JSON.parse(imagesJSON);
-                return images;
-            } else {
-                const images = await imagesCollection();
-                const allimages = await images
-                    .find({ rid: args.rid, food: args.food })
-                    .toArray();
-                if (!allimages) throw "Could not get restaurant images";
-                if (allimages.length > 0) {
-                    await client.setAsync(args.rid + food);
-                }
-                return allimages;
-            }
+            // let food = args.food ? "food" : "atmosphere";
+            // let exists = await client.existsAsync(args.rid + food);
+            // if (exists) {
+            //     let imagesJSON = await client.getAsync(args.rid + food);
+            //     let images = JSON.parse(imagesJSON);
+            //     return images;
+            // } else {
+            const images = await imagesCollection();
+            const allimages = await images
+                .find({ rid: args.rid, food: args.food })
+                .toArray();
+            if (!allimages) throw "Could not get restaurant images";
+            // if (allimages.length > 0) {
+            //     await client.setAsync(
+            //         args.rid + food,
+            //         JSON.stringify(allimages)
+            //     );
+            // }
+            return allimages;
+            // }
         },
         userImages: async (_, args) => {
             let exists = await client.existsAsync(args.userID + "user");
@@ -229,7 +240,10 @@ const resolvers = {
                     .toArray();
                 if (!allimages) throw "Could not get user images";
                 if (allimages.length > 0) {
-                    await client.setAsync(args.userID + "user");
+                    await client.setAsync(
+                        args.userID + "user",
+                        JSON.stringify(allimages)
+                    );
                 }
                 return allimages;
             }
@@ -337,7 +351,10 @@ const resolvers = {
                 if (image === null) {
                     throw "Image not found";
                 }
-                await client.setAsync(args.imageID + "image");
+                await client.setAsync(
+                    args.imageID + "image",
+                    JSON.stringify(image)
+                );
                 return image;
             }
         },
@@ -358,6 +375,7 @@ const resolvers = {
             return newUser;
         },
         uploadImage: async (_, args) => {
+            console.log(args.file);
             const response = await handleFileUpload(args.file);
 
             console.log(response.Location);

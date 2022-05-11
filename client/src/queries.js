@@ -31,7 +31,7 @@ const GET_RESTAURANTS_NEARBY = gql`
 
 const GET_RESTAURANT = gql`
     query GetRestaurant($rid: ID!) {
-        restaurants(rid: $rid) {
+        restaurant(rid: $rid) {
             _id
             name
             location {
@@ -96,27 +96,27 @@ const GET_USER_IMAGES = gql`
 
 const UPLOAD_IMAGE = gql`
     mutation UploadImage(
-        $url: String!
+        $file: Upload!
         $food: Boolean!
         $description: String
-        $rid: ID
-        $userID: ID
+        $rid: ID!
+        $userName: String!
     ) {
         uploadImage(
-            url: $url
+            file: $file
             food: $food
             description: $description
             rid: $rid
-            userId: $userId
+            userName: $userName
         ) {
             _id
             url
             description
             food
             rid
-            userID
+            userName
             comments {
-                userID
+                userName
                 comment
             }
         }

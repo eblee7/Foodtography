@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
+import queries from "../queries";
+import { useLazyQuery } from "@apollo/client";
 
-const ImageList = ({ type, id }) => {
+const ImageList = ({ type, rid }) => {
     //upload functionality
     //form (id,type,user,picture)
     //which would already have the id populated
@@ -8,19 +10,26 @@ const ImageList = ({ type, id }) => {
     // user (login thing)
     // upload picture
     //uploadImage mutation
+    const [called, setCalled] = useState(false);
+    const [getImages, { loading, error, data }] = useLazyQuery(
+        queries.GET_RESTAURANT_IMAGES
+    );
+    let food = type === "food" ? true : false;
+
+    if (loading) return <p>Loading ...</p>;
+    if (error) return `Error! ${error}`;
+    if (called === false) {
+        getImages({ variables: { rid, food } });
+        setCalled(true);
+    }
 
     //call getImages query
-    if (type === "food") {
-        return <div>Food</div>;
+    if (data) {
+        const { restaurantImages } = data;
+        return restaurantImages.map((image) => {
+            return <img src={image.url} />;
+        });
     }
-    if (type === "atmosphere") {
-        return <div>Atmosphere</div>;
-    }
-    return (
-        <>
-            <p> Image List</p>
-        </>
-    );
 };
 
 export default ImageList;
