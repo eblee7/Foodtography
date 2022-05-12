@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "./App.css";
 import {
     NavLink,
@@ -9,16 +9,10 @@ import {
 import Home from "./components/Home";
 // import SignIn from "./components/SignIn";
 import SearchBar from "./components/SearchBar";
-import ImageList from "./components/ImageList";
 import Image from "./components/Image";
 import Restaurant from "./components/Restaurant";
 import RestaurantList from "./components/RestaurantList";
-import {
-    ApolloClient,
-    HttpLink,
-    InMemoryCache,
-    ApolloProvider,
-} from "@apollo/client";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import { createUploadLink } from "apollo-upload-client";
 const client = new ApolloClient({
     cache: new InMemoryCache(),

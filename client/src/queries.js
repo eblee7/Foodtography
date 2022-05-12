@@ -45,7 +45,7 @@ const GET_RESTAURANT = gql`
 
 const GET_IMAGE = gql`
     query GetImage($imageID: ID!) {
-        images(imageID: $imageID) {
+        image(imageID: $imageID) {
             _id
             url
             description
@@ -134,9 +134,8 @@ const ADD_USER = gql`
 `;
 
 const ADD_COMMENT = gql`
-    mutation AddComment($userID: ID!, $imageID: ID!, $comment: String!) {
-        addComment(userID: $userID, imageID: $imageID, comment: $comment) {
-            userID
+    mutation AddComment($userName: String!, $imageID: ID!, $comment: String!) {
+        addComment(userName: $userName, imageID: $imageID, comment: $comment) {
             comment
         }
     }

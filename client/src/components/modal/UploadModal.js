@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import ReactModal from "react-modal";
-import { useQuery, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 //Import the file where my query constants are defined
 import queries from "../../queries";
-import { useParams } from "react-router-dom";
 
 //For react-modal
 ReactModal.setAppElement("#root");
@@ -65,7 +64,7 @@ function UploadModal(props) {
     let body = null;
     let imageDescription;
     let file;
-    let userName;
+    // let userName;
     body = (
         <form
             onSubmit={(e) => {

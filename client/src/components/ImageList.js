@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import queries from "../queries";
+import { Link } from "react-router-dom";
 import { useLazyQuery } from "@apollo/client";
 
 const ImageList = ({ type, rid }) => {
@@ -28,7 +29,12 @@ const ImageList = ({ type, rid }) => {
         const { restaurantImages } = data;
         console.log(restaurantImages);
         return restaurantImages.map((image) => {
-            return <img key={image.url} src={image.url} />;
+            console.log(image);
+            return (
+                <Link key={image._id} to={`/image/${image._id}`}>
+                    <img alt="temporary" src={image.url} />
+                </Link>
+            );
         });
     }
 };

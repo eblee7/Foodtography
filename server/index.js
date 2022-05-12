@@ -6,6 +6,7 @@ const bluebird = require("bluebird");
 const client = redis.createClient();
 const axios = require("axios");
 const AWS = require("aws-sdk");
+const im = require("imagemagick");
 require("dotenv").config();
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
@@ -25,32 +26,55 @@ const s3DefaultParams = {
     ],
 };
 const handleFileUpload = async (file) => {
-    console.log(file);
     const { createReadStream, filename } = await file;
-    console.log(createReadStream, filename);
 
     const key = uuid.v4();
 
     // image magick stuff
+    // let chunks = [];
+    // let fileBuffer;
+    // createReadStream();
+    // fileStream.on("data", (chunk) => {
+    //     chunks.push(chunk);
+    // });
+    // fileStream.once("end", () => {
+    //     fileBuffer = Buffer.concat(chunks);
+    // });
 
-    return new Promise((resolve, reject) => {
-        s3.upload(
-            {
-                ...s3DefaultParams,
-                Body: createReadStream(),
-                Key: `images/${key}${filename}`,
-            },
-            (err, data) => {
-                if (err) {
-                    console.log("error uploading...", err);
-                    reject(err);
-                } else {
-                    console.log("successfully uploaded file...", data);
-                    resolve(data);
-                }
-            }
-        );
-    });
+    // console.log(chunks);
+
+    // console.log(fileBuffer);
+
+    im.resize(
+        {
+            srcData: createReadStream(),
+            width: 256,
+            height: 256,
+        },
+        function (err, stdout, stderr) {
+            if (err) throw err;
+            // fs.writeFileSync("kittens-resized.jpg", stdout, "binary");
+            // console.log("resized kittens.jpg to fit within 256x256px");
+            return new Promise((resolve, reject) => {
+                s3.upload(
+                    {
+                        ...s3DefaultParams,
+                        Body: stdout,
+                        Key: `images/${key}${filename}`,
+                    },
+                    (err, data) => {
+                        if (err) {
+                            console.log("error uploading...", err);
+                            reject(err);
+                        } else {
+                            console.log("successfully uploaded file...", data);
+                            resolve(data);
+                        }
+                    }
+                );
+            });
+        }
+    );
 };
 
 //Some Mock Data
@@ -142,7 +166,7 @@ const typeDefs = gql`
             userName: String!
         ): ImagePost
         addUser(userName: String!, password: String!, email: String!): User
-        addComment(userID: ID!, imageID: ID!, comment: String!): Comment
+        addComment(userName: String!, imageID: ID!, comment: String!): Comment
     }
 `;
 // Update Image and Delete Image
@@ -206,6 +230,8 @@ const resolvers = {
             }
         },
         restaurantImages: async (_, args) => {
+            // TODO: fix redis so that when they upload image it is stored in redis
+
             // let food = args.food ? "food" : "atmosphere";
             // let exists = await client.existsAsync(args.rid + food);
             // if (exists) {
@@ -265,6 +291,13 @@ const resolvers = {
                 }
                 let data = response.data.candidates[0];
                 let addressVicinity = data.formatted_address;
+
+                // let data = {
+                //     place_id: "ChIJTWpC695ZwokRloO5qV4pt1I",
+                // };
+                // let addressVicinity =
+                //     "1 Castle Point Terrace, Hoboken, NJ 07030, United States";
+
                 let exists = await client.existsAsync(data.place_id + "NearBy");
                 if (exists) {
                     console.log("redis!");
@@ -293,25 +326,31 @@ const resolvers = {
                         };
                     });
                     for (let i = 0; i < nearbyData.length; i++) {
-                        let reference = nearbyData[i].photos[0].photo_reference;
-                        // mongo to check to see if this id is in the res collection and has the url if it doesnt then u make the call and store
-                        const restaurants = await restaurantsCollection();
-                        const restaurantResult = await restaurants.findOne({
-                            _id: nearbyData[i].place_id,
-                        });
-                        if (restaurantResult === null) {
-                            config.url = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${reference}&key=${apiKey}`;
-                            let photoData = await axios(config);
-                            console.log("axios3");
-                            places[i].url = photoData.request.res.responseUrl;
-                            const newRestaurant = {
-                                _id: places[i]._id,
-                                url: places[i].url,
-                            };
-                            await restaurants.insertOne(newRestaurant);
+                        if (nearbyData[i].photos) {
+                            let reference =
+                                nearbyData[i].photos[0].photo_reference;
+                            // mongo to check to see if this id is in the res collection and has the url if it doesnt then u make the call and store
+                            const restaurants = await restaurantsCollection();
+                            const restaurantResult = await restaurants.findOne({
+                                _id: nearbyData[i].place_id,
+                            });
+                            if (restaurantResult === null) {
+                                config.url = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${reference}&key=${apiKey}`;
+                                let photoData = await axios(config);
+                                console.log("axios3");
+                                places[i].url =
+                                    photoData.request.res.responseUrl;
+                                const newRestaurant = {
+                                    _id: places[i]._id,
+                                    url: places[i].url,
+                                };
+                                await restaurants.insertOne(newRestaurant);
+                            } else {
+                                console.log("from mongo");
+                                places[i].url = restaurantResult.url;
+                            }
                         } else {
-                            console.log("from mongo");
-                            places[i].url = restaurantResult.url;
+                            places[i].url = "";
                         }
                     }
                     let searchResults = {
@@ -340,23 +379,23 @@ const resolvers = {
             }
         },
         image: async (_, args) => {
-            let exists = await client.existsAsync(args.imageID + "image");
-            if (exists) {
-                let imageJSON = await client.getAsync(args.imageID + "image");
-                let image = JSON.parse(imageJSON);
-                return image;
-            } else {
-                const images = await imagesCollection();
-                const image = await images.findOne({ _id: args.imageID });
-                if (image === null) {
-                    throw "Image not found";
-                }
-                await client.setAsync(
-                    args.imageID + "image",
-                    JSON.stringify(image)
-                );
-                return image;
+            // let exists = await client.existsAsync(args.imageID + "image");
+            // if (exists) {
+            //     let imageJSON = await client.getAsync(args.imageID + "image");
+            //     let image = JSON.parse(imageJSON);
+            //     return image;
+            // } else {
+            const images = await imagesCollection();
+            const image = await images.findOne({ _id: args.imageID });
+            if (image === null) {
+                throw "Image not found";
             }
+            // await client.setAsync(
+            //     args.imageID + "image",
+            //     JSON.stringify(image)
+            // );
+            return image;
+            // }
         },
     },
     Mutation: {
