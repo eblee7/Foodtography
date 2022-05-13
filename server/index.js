@@ -7,6 +7,7 @@ const client = redis.createClient();
 const axios = require("axios");
 const AWS = require("aws-sdk");
 const im = require("imagemagick");
+const fs = require("fs");
 require("dotenv").config();
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
@@ -26,55 +27,63 @@ const s3DefaultParams = {
     ],
 };
 const handleFileUpload = async (file) => {
+    console.log(file, "file");
     const { createReadStream, filename } = await file;
 
     const key = uuid.v4();
 
-    // image magick stuff
-    // let chunks = [];
-    // let fileBuffer;
-    // createReadStream();
-    // fileStream.on("data", (chunk) => {
-    //     chunks.push(chunk);
-    // });
-    // fileStream.once("end", () => {
-    //     fileBuffer = Buffer.concat(chunks);
-    // });
+    const stream = createReadStream();
 
-    // console.log(chunks);
+    const out = require("fs").createWriteStream("images/local-file-output.jpg");
 
-    // console.log(fileBuffer);
+    stream.pipe(out);
 
-    im.resize(
-        {
-            srcData: createReadStream(),
-            width: 256,
-            height: 256,
-        },
-        function (err, stdout, stderr) {
-            if (err) throw err;
-            // fs.writeFileSync("kittens-resized.jpg", stdout, "binary");
-            // console.log("resized kittens.jpg to fit within 256x256px");
-            return new Promise((resolve, reject) => {
-                s3.upload(
-                    {
-                        ...s3DefaultParams,
-                        Body: stdout,
-                        Key: `images/${key}${filename}`,
-                    },
-                    (err, data) => {
-                        if (err) {
-                            console.log("error uploading...", err);
-                            reject(err);
-                        } else {
-                            console.log("successfully uploaded file...", data);
-                            resolve(data);
+    out.on("finish", () => {
+        im.resize(
+            {
+                srcPath: "images/local-file-output.jpg",
+                dstPath: "images/modified.jpg",
+                width: 256,
+                height: 256,
+            },
+            function (err, stdout, stderr) {
+                if (err) throw err;
+                return new Promise((resolve, reject) => {
+                    s3.upload(
+                        {
+                            ...s3DefaultParams,
+                            Body: fs.readFileSync("images/modified.jpg"),
+                            Key: `images/${key}${filename}`,
+                        },
+                        (err, data) => {
+                            if (err) {
+                                console.log("error uploading...", err);
+                                reject(err);
+                            } else {
+                                console.log(
+                                    "successfully uploaded file...",
+                                    data
+                                );
+                                resolve(data);
+                            }
                         }
-                    }
-                );
-            });
-        }
-    );
+                    );
+                });
+            }
+        );
+    });
+
+    const s3Params = {
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: key + filename,
+        Expire: 60,
+        ACL: "public-read",
+    };
+
+    const signedRequest = s3.getSignedUrl("getObject", s3Params);
+    const url = `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/images/${key}${filename}`;
+
+    return url;
 };
 
 //Some Mock Data
@@ -414,24 +423,83 @@ const resolvers = {
             return newUser;
         },
         uploadImage: async (_, args) => {
-            console.log(args.file);
-            const response = await handleFileUpload(args.file);
+            const { createReadStream, filename } = await args.file;
 
-            console.log(response.Location);
+            const key = uuid.v4();
 
-            const images = await imagesCollection();
+            const stream = createReadStream();
 
-            const newImage = {
-                _id: uuid.v4(),
-                url: response.Location,
-                food: args.food,
-                description: args.description,
-                userName: args.userName,
-                rid: args.rid,
-                comments: [],
-            };
-            await images.insertOne(newImage);
-            return newImage;
+            const out = require("fs").createWriteStream(
+                "images/local-file-output.jpg"
+            );
+
+            stream.pipe(out);
+
+            return await new Promise((resolve, reject) => {
+                out.on("finish", () => {
+                    resolve(
+                        new Promise((resolve, reject) => {
+                            im.resize(
+                                {
+                                    srcPath: "images/local-file-output.jpg",
+                                    dstPath: "images/modified.jpg",
+                                    width: 256,
+                                    height: 256,
+                                },
+                                function (err, stdout, stderr) {
+                                    if (err) reject(err);
+                                    resolve(
+                                        new Promise((resolve, reject) => {
+                                            s3.upload(
+                                                {
+                                                    ...s3DefaultParams,
+                                                    Body: fs.readFileSync(
+                                                        "images/modified.jpg"
+                                                    ),
+                                                    Key: `images/${key}${filename}`,
+                                                },
+                                                async (err, data) => {
+                                                    if (err) {
+                                                        console.log(
+                                                            "error uploading...",
+                                                            err
+                                                        );
+                                                        reject(err);
+                                                    } else {
+                                                        console.log(
+                                                            "successfully uploaded file...",
+                                                            data
+                                                        );
+                                                        const images =
+                                                            await imagesCollection();
+
+                                                        const newImage = {
+                                                            _id: uuid.v4(),
+                                                            url: data.Location,
+                                                            food: args.food,
+                                                            description:
+                                                                args.description,
+                                                            userName:
+                                                                args.userName,
+                                                            rid: args.rid,
+                                                            comments: [],
+                                                        };
+                                                        console.log(newImage);
+                                                        await images.insertOne(
+                                                            newImage
+                                                        );
+                                                        resolve(newImage);
+                                                    }
+                                                }
+                                            );
+                                        })
+                                    );
+                                }
+                            );
+                        })
+                    );
+                });
+            });
         },
         addComment: async (_, args) => {
             const images = await imagesCollection();

@@ -32,6 +32,7 @@ function UploadModal(props) {
                 query: queries.GET_RESTAURANT_IMAGES,
                 variables: { rid: props.rid, food },
             });
+            console.log(uploadImage);
             cache.writeQuery({
                 query: queries.GET_RESTAURANT_IMAGES,
                 data: {
@@ -69,7 +70,7 @@ function UploadModal(props) {
         <form
             onSubmit={(e) => {
                 e.preventDefault();
-                console.log(file);
+                console.log(file.files, "file");
                 uploadImage({
                     variables: {
                         file: file.files[0],
