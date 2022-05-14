@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
 import { useParams } from "react-router-dom";
+import { useAuth } from "../firebase/AuthContext";
 import queries from "../queries";
 import ImageList from "./ImageList";
 import UploadModal from "./modal/UploadModal";
@@ -8,6 +9,7 @@ import UploadModal from "./modal/UploadModal";
 const Restaurant = () => {
     const { id } = useParams();
     //api call for location details based on useParams
+    const { currentUser } = useAuth();
 
     const [type, setType] = useState();
     const [uploadModal, setuploadModal] = useState(false);
@@ -35,7 +37,7 @@ const Restaurant = () => {
             <>
                 <h1>{restaurant.name}</h1>
                 <h1>{restaurant.location.vicinity}</h1>
-                {type && (
+                {currentUser && type && (
                     <button className="button" onClick={handleOpenUploadModal}>
                         {" "}
                         Upload Image

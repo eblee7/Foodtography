@@ -16,9 +16,11 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
+import { useAuth } from "../firebase/AuthContext";
 import ".././App.css";
 
 const Image = () => {
+  const { currentUser } = useAuth();
   const { id } = useParams();
   const { loading, error, data } = useQuery(queries.GET_IMAGE, {
     variables: { imageID: id },
@@ -93,35 +95,39 @@ const Image = () => {
               );
             })}
           </List>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              addComment({
-                variables: {
-                  userName: "1234",
-                  imageID: id,
-                  comment: comment.value,
-                },
-              });
-              comment.value = "";
-            }}
-          >
-            <div>
-              <label>
-                Comment
-                <br />
-                <input
-                  ref={(node) => {
-                    comment = node;
-                  }}
-                  required
-                />
-              </label>
-            </div>
-            <br />
+          {currentUser ? (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                addComment({
+                  variables: {
+                    userName: currentUser.userName,
+                    imageID: id,
+                    comment: comment.value,
+                  },
+                });
+                comment.value = "";
+              }}
+            >
+              <div>
+                <label>
+                  Comment
+                  <br />
+                  <input
+                    ref={(node) => {
+                      comment = node;
+                    }}
+                    required
+                  />
+                </label>
+              </div>
+              <br />
 
-            <button type="submit">Add Comment</button>
-          </form>
+              <button type="submit">Add Comment</button>
+            </form>
+          ) : (
+            <h2>Sign in to comment</h2>
+          )}
         </Grid>
       </Grid>
     );

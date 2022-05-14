@@ -26,65 +26,65 @@ const s3DefaultParams = {
         ["content-length-range", 0, 1024000], // 1 Mb
     ],
 };
-const handleFileUpload = async (file) => {
-    console.log(file, "file");
-    const { createReadStream, filename } = await file;
+// const handleFileUpload = async (file) => {
+//     console.log(file, "file");
+//     const { createReadStream, filename } = await file;
 
-    const key = uuid.v4();
+//     const key = uuid.v4();
 
-    const stream = createReadStream();
+//     const stream = createReadStream();
 
-    const out = require("fs").createWriteStream("images/local-file-output.jpg");
+//     const out = require("fs").createWriteStream("images/local-file-output.jpg");
 
-    stream.pipe(out);
+//     stream.pipe(out);
 
-    out.on("finish", () => {
-        im.resize(
-            {
-                srcPath: "images/local-file-output.jpg",
-                dstPath: "images/modified.jpg",
-                width: 256,
-                height: 256,
-            },
-            function (err, stdout, stderr) {
-                if (err) throw err;
-                return new Promise((resolve, reject) => {
-                    s3.upload(
-                        {
-                            ...s3DefaultParams,
-                            Body: fs.readFileSync("images/modified.jpg"),
-                            Key: `images/${key}${filename}`,
-                        },
-                        (err, data) => {
-                            if (err) {
-                                console.log("error uploading...", err);
-                                reject(err);
-                            } else {
-                                console.log(
-                                    "successfully uploaded file...",
-                                    data
-                                );
-                                resolve(data);
-                            }
-                        }
-                    );
-                });
-            }
-        );
-    });
+//     out.on("finish", () => {
+//         im.resize(
+//             {
+//                 srcPath: "images/local-file-output.jpg",
+//                 dstPath: "images/modified.jpg",
+//                 width: 256,
+//                 height: 256,
+//             },
+//             function (err, stdout, stderr) {
+//                 if (err) throw err;
+//                 return new Promise((resolve, reject) => {
+//                     s3.upload(
+//                         {
+//                             ...s3DefaultParams,
+//                             Body: fs.readFileSync("images/modified.jpg"),
+//                             Key: `images/${key}${filename}`,
+//                         },
+//                         (err, data) => {
+//                             if (err) {
+//                                 console.log("error uploading...", err);
+//                                 reject(err);
+//                             } else {
+//                                 console.log(
+//                                     "successfully uploaded file...",
+//                                     data
+//                                 );
+//                                 resolve(data);
+//                             }
+//                         }
+//                     );
+//                 });
+//             }
+//         );
+//     });
 
-    const s3Params = {
-        Bucket: process.env.S3_BUCKET_NAME,
-        Key: key + filename,
-        Expire: 60,
-        ACL: "public-read",
-    };
+//     const s3Params = {
+//         Bucket: process.env.S3_BUCKET_NAME,
+//         Key: key + filename,
+//         Expire: 60,
+//         ACL: "public-read",
+//     };
 
-    const signedRequest = s3.getSignedUrl("getObject", s3Params);
-    const url = `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/images/${key}${filename}`;
+//     const url = s3.getSignedUrl("getObject", s3Params);
+//     // const url = `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/images/${key}${filename}`;
 
-    return url;
-};
+//     return url;
+// };
 
 //Some Mock Data
 const restaurantsCollection = mongoCollections.restaurants;
@@ -239,49 +239,21 @@ const resolvers = {
             }
         },
         restaurantImages: async (_, args) => {
-            // TODO: fix redis so that when they upload image it is stored in redis
-
-            // let food = args.food ? "food" : "atmosphere";
-            // let exists = await client.existsAsync(args.rid + food);
-            // if (exists) {
-            //     let imagesJSON = await client.getAsync(args.rid + food);
-            //     let images = JSON.parse(imagesJSON);
-            //     return images;
-            // } else {
             const images = await imagesCollection();
             const allimages = await images
                 .find({ rid: args.rid, food: args.food })
                 .toArray();
             if (!allimages) throw "Could not get restaurant images";
-            // if (allimages.length > 0) {
-            //     await client.setAsync(
-            //         args.rid + food,
-            //         JSON.stringify(allimages)
-            //     );
-            // }
             return allimages;
-            // }
         },
         userImages: async (_, args) => {
-            let exists = await client.existsAsync(args.userID + "user");
-            if (exists) {
-                let imagesJSON = await client.getAsync(args.userID + "user");
-                let images = JSON.parse(imagesJSON);
-                return images;
-            } else {
-                const images = await imagesCollection();
-                const allimages = await images
-                    .find({ userID: args.userID })
-                    .toArray();
-                if (!allimages) throw "Could not get user images";
-                if (allimages.length > 0) {
-                    await client.setAsync(
-                        args.userID + "user",
-                        JSON.stringify(allimages)
-                    );
-                }
-                return allimages;
-            }
+            const images = await imagesCollection();
+            const allimages = await images
+                .find({ userID: args.userID })
+                .toArray();
+            if (!allimages) throw "Could not get user images";
+
+            return allimages;
         },
         restaurantsNearby: async (_, args) => {
             if (!args.address) {

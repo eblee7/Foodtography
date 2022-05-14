@@ -1,12 +1,18 @@
 import React from "react";
 import "./App.css";
+import { AuthProvider } from "./firebase/AuthContext";
 import { Link, BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./components/Home";
-// import SignIn from "./components/SignIn";
 import SearchBar from "./components/SearchBar";
 import Image from "./components/Image";
 import Restaurant from "./components/Restaurant";
 import RestaurantList from "./components/RestaurantList";
+import SignUp from "./components/SignUp";
+import Account from "./components/Account";
+import SignIn from "./components/SignIn";
+import PrivateRoute from "./components/PrivateRoute";
+import Reset from "./components/Reset";
+import NavBar from "./components/NavBar";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import { createUploadLink } from "apollo-upload-client";
 import AppBar from "@mui/material/AppBar";
@@ -30,67 +36,37 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <Router>
-        <div>
+        <AuthProvider>
           <div>
-            <header>
-              <AppBar position="static">
-                <Toolbar variant="dense">
-                  <IconButton
-                    edge="start"
-                    color="inherit"
-                    aria-label="menu"
-                    sx={{ mr: 2 }}
-                  ></IconButton>
-                  <Typography variant="h4">Foodtography</Typography>
-
-                  <MenuItem component={Link} to="/">
-                    <Typography textAlign="center">Home</Typography>
-                  </MenuItem>
-
-                  <MenuItem component={Link} to="/login">
-                    <Typography textAlign="center">Login</Typography>
-                  </MenuItem>
-                </Toolbar>
-              </AppBar>
-            </header>
+            <div>
+              <header>
+                <NavBar />
+              </header>
+            </div>
+            <div>
+              <SearchBar />
+            </div>
+            <br />
+            <br />
+            <div>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/image/:id" element={<Image />} />
+                <Route
+                  path="/restaurants/:address"
+                  element={<RestaurantList />}
+                />
+                <Route path="/restaurant/:id" element={<Restaurant />} />
+                <Route path="/account" element={<PrivateRoute />}>
+                  <Route path="/account" element={<Account />} />
+                </Route>
+                <Route path="/signin" element={<SignIn />} />
+                <Route path="/signup" element={<SignUp />} />
+                <Route path="/reset" element={<Reset />} />
+              </Routes>
+            </div>
           </div>
-          <div>
-            <SearchBar />
-          </div>
-          <br />
-          <br />
-          <div>
-            <Routes>
-              <Route path="/" element={<Home />} />
-
-              {/* copied from lecture slides might need to change format */}
-              {/* <Route path="/home" element={<PrivateRoute />}> */}
-              {/* <Route path="/home" element={<Home />} /> */}
-              {/* </Route> */}
-              {/* <Route path="/account" element={<PrivateRoute />}> */}
-              {/* <Route path="/account" element={<Account />} /> */}
-              {/* </Route> */}
-              {/* copied from lecture slides might need to change format */}
-              {/* 
-                        <Route path="/signin" element={<SignIn />} />
-                        <Route path="/signup" element={<SignUp />} /> */}
-              {/* <Route
-                                path="/image/food/page/:pagenum"
-                                element={<ImageList />}
-                            />
-                            <Route
-                                path="/image/atmosphere/page/:pagenum"
-                                element={<ImageList />}
-                            /> */}
-              <Route path="/image/:id" element={<Image />} />
-              <Route
-                path="/restaurants/:address"
-                element={<RestaurantList />}
-              />
-              <Route path="/restaurant/:id" element={<Restaurant />} />
-            </Routes>
-          </div>
-        </div>
+        </AuthProvider>
       </Router>
     </ApolloProvider>
   );

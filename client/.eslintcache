@@ -1,1 +1,331 @@
-[{"/Users/naomizheng/Foodtography/client/src/index.js":"1","/Users/naomizheng/Foodtography/client/src/reportWebVitals.js":"2","/Users/naomizheng/Foodtography/client/src/App.js":"3","/Users/naomizheng/Foodtography/client/src/components/Home.js":"4","/Users/naomizheng/Foodtography/client/src/components/Image.js":"5","/Users/naomizheng/Foodtography/client/src/components/SearchBar.js":"6","/Users/naomizheng/Foodtography/client/src/components/RestaurantList.js":"7","/Users/naomizheng/Foodtography/client/src/components/Restaurant.js":"8","/Users/naomizheng/Foodtography/client/src/queries.js":"9","/Users/naomizheng/Foodtography/client/src/components/ImageList.js":"10","/Users/naomizheng/Foodtography/client/src/components/modal/UploadModal.js":"11"},{"size":513,"mtime":1652467723354,"results":"12","hashOfConfig":"13"},{"size":362,"mtime":1651341007201,"results":"14","hashOfConfig":"13"},{"size":3569,"mtime":1652484699873,"results":"15","hashOfConfig":"13"},{"size":91,"mtime":1652467723352,"results":"16","hashOfConfig":"13"},{"size":3736,"mtime":1652491440834,"results":"17","hashOfConfig":"13"},{"size":1269,"mtime":1652484944936,"results":"18","hashOfConfig":"13"},{"size":2342,"mtime":1652490731854,"results":"19","hashOfConfig":"13"},{"size":1905,"mtime":1652467723353,"results":"20","hashOfConfig":"13"},{"size":3116,"mtime":1652467723355,"results":"21","hashOfConfig":"13"},{"size":2407,"mtime":1652491250653,"results":"22","hashOfConfig":"13"},{"size":4364,"mtime":1652467723354,"results":"23","hashOfConfig":"13"},{"filePath":"24","messages":"25","errorCount":0,"fatalErrorCount":0,"warningCount":0,"fixableErrorCount":0,"fixableWarningCount":0,"usedDeprecatedRules":"26"},"800exq",{"filePath":"27","messages":"28","errorCount":0,"fatalErrorCount":0,"warningCount":0,"fixableErrorCount":0,"fixableWarningCount":0,"usedDeprecatedRules":"26"},{"filePath":"29","messages":"30","errorCount":0,"fatalErrorCount":0,"warningCount":2,"fixableErrorCount":0,"fixableWarningCount":0,"source":null},{"filePath":"31","messages":"32","errorCount":0,"fatalErrorCount":0,"warningCount":0,"fixableErrorCount":0,"fixableWarningCount":0,"usedDeprecatedRules":"26"},{"filePath":"33","messages":"34","errorCount":0,"fatalErrorCount":0,"warningCount":4,"fixableErrorCount":0,"fixableWarningCount":0,"source":null},{"filePath":"35","messages":"36","errorCount":0,"fatalErrorCount":0,"warningCount":0,"fixableErrorCount":0,"fixableWarningCount":0},{"filePath":"37","messages":"38","errorCount":0,"fatalErrorCount":0,"warningCount":0,"fixableErrorCount":0,"fixableWarningCount":0},{"filePath":"39","messages":"40","errorCount":0,"fatalErrorCount":0,"warningCount":0,"fixableErrorCount":0,"fixableWarningCount":0,"usedDeprecatedRules":"26"},{"filePath":"41","messages":"42","errorCount":0,"fatalErrorCount":0,"warningCount":0,"fixableErrorCount":0,"fixableWarningCount":0,"usedDeprecatedRules":"26"},{"filePath":"43","messages":"44","errorCount":0,"fatalErrorCount":0,"warningCount":1,"fixableErrorCount":0,"fixableWarningCount":0,"source":null},{"filePath":"45","messages":"46","errorCount":0,"fatalErrorCount":0,"warningCount":0,"fixableErrorCount":0,"fixableWarningCount":0,"usedDeprecatedRules":"26"},"/Users/naomizheng/Foodtography/client/src/index.js",[],["47","48"],"/Users/naomizheng/Foodtography/client/src/reportWebVitals.js",[],"/Users/naomizheng/Foodtography/client/src/App.js",["49","50"],"/Users/naomizheng/Foodtography/client/src/components/Home.js",[],"/Users/naomizheng/Foodtography/client/src/components/Image.js",["51","52","53","54"],"/Users/naomizheng/Foodtography/client/src/components/SearchBar.js",[],"/Users/naomizheng/Foodtography/client/src/components/RestaurantList.js",[],"/Users/naomizheng/Foodtography/client/src/components/Restaurant.js",[],"/Users/naomizheng/Foodtography/client/src/queries.js",[],"/Users/naomizheng/Foodtography/client/src/components/ImageList.js",["55"],"/Users/naomizheng/Foodtography/client/src/components/modal/UploadModal.js",[],{"ruleId":"56","replacedBy":"57"},{"ruleId":"58","replacedBy":"59"},{"ruleId":"60","severity":1,"message":"61","line":18,"column":7,"nodeType":"62","messageId":"63","endLine":18,"endColumn":12},{"ruleId":"60","severity":1,"message":"64","line":19,"column":7,"nodeType":"62","messageId":"63","endLine":19,"endColumn":15},{"ruleId":"60","severity":1,"message":"65","line":9,"column":8,"nodeType":"62","messageId":"63","endLine":9,"endColumn":14},{"ruleId":"60","severity":1,"message":"66","line":15,"column":8,"nodeType":"62","messageId":"63","endLine":15,"endColumn":22},{"ruleId":"60","severity":1,"message":"67","line":16,"column":8,"nodeType":"62","messageId":"63","endLine":16,"endColumn":17},{"ruleId":"60","severity":1,"message":"68","line":18,"column":8,"nodeType":"62","messageId":"63","endLine":18,"endColumn":13},{"ruleId":"60","severity":1,"message":"69","line":8,"column":8,"nodeType":"62","messageId":"63","endLine":8,"endColumn":18},"no-native-reassign",["70"],"no-negated-in-lhs",["71"],"no-unused-vars","'pages' is assigned a value but never used.","Identifier","unusedVar","'settings' is assigned a value but never used.","'Avatar' is defined but never used.","'ListItemAvatar' is defined but never used.","'Container' is defined but never used.","'Paper' is defined but never used.","'CardHeader' is defined but never used.","no-global-assign","no-unsafe-negation"]
+[
+  {
+    "/Users/naomizheng/Foodtography/client/src/index.js": "1",
+    "/Users/naomizheng/Foodtography/client/src/reportWebVitals.js": "2",
+    "/Users/naomizheng/Foodtography/client/src/App.js": "3",
+    "/Users/naomizheng/Foodtography/client/src/components/Home.js": "4",
+    "/Users/naomizheng/Foodtography/client/src/components/Image.js": "5",
+    "/Users/naomizheng/Foodtography/client/src/components/SearchBar.js": "6",
+    "/Users/naomizheng/Foodtography/client/src/components/RestaurantList.js": "7",
+    "/Users/naomizheng/Foodtography/client/src/components/Restaurant.js": "8",
+    "/Users/naomizheng/Foodtography/client/src/queries.js": "9",
+    "/Users/naomizheng/Foodtography/client/src/components/ImageList.js": "10",
+    "/Users/naomizheng/Foodtography/client/src/components/modal/UploadModal.js": "11"
+  },
+  {
+    "size": 513,
+    "mtime": 1652467723354,
+    "results": "12",
+    "hashOfConfig": "13"
+  },
+  {
+    "size": 362,
+    "mtime": 1651341007201,
+    "results": "14",
+    "hashOfConfig": "13"
+  },
+  {
+    "size": 3569,
+    "mtime": 1652484699873,
+    "results": "15",
+    "hashOfConfig": "13"
+  },
+  {
+    "size": 91,
+    "mtime": 1652467723352,
+    "results": "16",
+    "hashOfConfig": "13"
+  },
+  {
+    "size": 3736,
+    "mtime": 1652491440834,
+    "results": "17",
+    "hashOfConfig": "13"
+  },
+  {
+    "size": 1269,
+    "mtime": 1652484944936,
+    "results": "18",
+    "hashOfConfig": "13"
+  },
+  {
+    "size": 2342,
+    "mtime": 1652490731854,
+    "results": "19",
+    "hashOfConfig": "13"
+  },
+  {
+    "size": 1905,
+    "mtime": 1652467723353,
+    "results": "20",
+    "hashOfConfig": "13"
+  },
+  {
+    "size": 3116,
+    "mtime": 1652467723355,
+    "results": "21",
+    "hashOfConfig": "13"
+  },
+  {
+    "size": 2407,
+    "mtime": 1652491250653,
+    "results": "22",
+    "hashOfConfig": "13"
+  },
+  {
+    "size": 4364,
+    "mtime": 1652467723354,
+    "results": "23",
+    "hashOfConfig": "13"
+  },
+  {
+    "filePath": "24",
+    "messages": "25",
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": "26"
+  },
+  "800exq",
+  {
+    "filePath": "27",
+    "messages": "28",
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": "26"
+  },
+  {
+    "filePath": "29",
+    "messages": "30",
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 2,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "source": null
+  },
+  {
+    "filePath": "31",
+    "messages": "32",
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": "26"
+  },
+  {
+    "filePath": "33",
+    "messages": "34",
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 4,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "source": null
+  },
+  {
+    "filePath": "35",
+    "messages": "36",
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0
+  },
+  {
+    "filePath": "37",
+    "messages": "38",
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0
+  },
+  {
+    "filePath": "39",
+    "messages": "40",
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": "26"
+  },
+  {
+    "filePath": "41",
+    "messages": "42",
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": "26"
+  },
+  {
+    "filePath": "43",
+    "messages": "44",
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 1,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "source": null
+  },
+  {
+    "filePath": "45",
+    "messages": "46",
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": "26"
+  },
+  "/Users/naomizheng/Foodtography/client/src/index.js",
+  [],
+  [
+    "47",
+    "48"
+  ],
+  "/Users/naomizheng/Foodtography/client/src/reportWebVitals.js",
+  [],
+  "/Users/naomizheng/Foodtography/client/src/App.js",
+  [
+    "49",
+    "50"
+  ],
+  "/Users/naomizheng/Foodtography/client/src/components/Home.js",
+  [],
+  "/Users/naomizheng/Foodtography/client/src/components/Image.js",
+  [
+    "51",
+    "52",
+    "53",
+    "54"
+  ],
+  "/Users/naomizheng/Foodtography/client/src/components/SearchBar.js",
+  [],
+  "/Users/naomizheng/Foodtography/client/src/components/RestaurantList.js",
+  [],
+  "/Users/naomizheng/Foodtography/client/src/components/Restaurant.js",
+  [],
+  "/Users/naomizheng/Foodtography/client/src/queries.js",
+  [],
+  "/Users/naomizheng/Foodtography/client/src/components/ImageList.js",
+  [
+    "55"
+  ],
+  "/Users/naomizheng/Foodtography/client/src/components/modal/UploadModal.js",
+  [],
+  {
+    "ruleId": "56",
+    "replacedBy": "57"
+  },
+  {
+    "ruleId": "58",
+    "replacedBy": "59"
+  },
+  {
+    "ruleId": "60",
+    "severity": 1,
+    "message": "61",
+    "line": 18,
+    "column": 7,
+    "nodeType": "62",
+    "messageId": "63",
+    "endLine": 18,
+    "endColumn": 12
+  },
+  {
+    "ruleId": "60",
+    "severity": 1,
+    "message": "64",
+    "line": 19,
+    "column": 7,
+    "nodeType": "62",
+    "messageId": "63",
+    "endLine": 19,
+    "endColumn": 15
+  },
+  {
+    "ruleId": "60",
+    "severity": 1,
+    "message": "65",
+    "line": 9,
+    "column": 8,
+    "nodeType": "62",
+    "messageId": "63",
+    "endLine": 9,
+    "endColumn": 14
+  },
+  {
+    "ruleId": "60",
+    "severity": 1,
+    "message": "66",
+    "line": 15,
+    "column": 8,
+    "nodeType": "62",
+    "messageId": "63",
+    "endLine": 15,
+    "endColumn": 22
+  },
+  {
+    "ruleId": "60",
+    "severity": 1,
+    "message": "67",
+    "line": 16,
+    "column": 8,
+    "nodeType": "62",
+    "messageId": "63",
+    "endLine": 16,
+    "endColumn": 17
+  },
+  {
+    "ruleId": "60",
+    "severity": 1,
+    "message": "68",
+    "line": 18,
+    "column": 8,
+    "nodeType": "62",
+    "messageId": "63",
+    "endLine": 18,
+    "endColumn": 13
+  },
+  {
+    "ruleId": "60",
+    "severity": 1,
+    "message": "69",
+    "line": 8,
+    "column": 8,
+    "nodeType": "62",
+    "messageId": "63",
+    "endLine": 8,
+    "endColumn": 18
+  },
+  "no-native-reassign",
+  [
+    "70"
+  ],
+  "no-negated-in-lhs",
+  [
+    "71"
+  ],
+  "no-unused-vars",
+  "'pages' is assigned a value but never used.",
+  "Identifier",
+  "unusedVar",
+  "'settings' is assigned a value but never used.",
+  "'Avatar' is defined but never used.",
+  "'ListItemAvatar' is defined but never used.",
+  "'Container' is defined but never used.",
+  "'Paper' is defined but never used.",
+  "'CardHeader' is defined but never used.",
+  "no-global-assign",
+  "no-unsafe-negation"
+]

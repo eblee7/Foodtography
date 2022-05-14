@@ -11,13 +11,6 @@ import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 
 const ImageList = ({ type, rid }) => {
-  //upload functionality
-  //form (id,type,user,picture)
-  //which would already have the id populated
-  // type which is already populated
-  // user (login thing)
-  // upload picture
-  //uploadImage mutation
   const [currentFood, setCurrentFood] = useState(null);
   const [getImages, { loading, error, data }] = useLazyQuery(
     queries.GET_RESTAURANT_IMAGES
