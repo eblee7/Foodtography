@@ -10,36 +10,43 @@ import MenuItem from "@mui/material/MenuItem";
 const NavBar = () => {
   const { currentUser } = useAuth();
   return (
-    <nav>
-      <NavLink to="/">Foodtography</NavLink>
-      {currentUser ? (
-        <NavLink to="/account">Account</NavLink>
-      ) : (
-        <NavLink to="/signin">Sign In</NavLink>
-      )}
-    </nav>
+    <AppBar position="static">
+      <Toolbar variant="dense">
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="menu"
+          sx={{ mr: 2 }}
+        ></IconButton>
+        <Typography variant="h4">Foodtography</Typography>
+
+        <MenuItem component={Link} to="/">
+          <Typography textAlign="center">Home</Typography>
+        </MenuItem>
+
+        {currentUser ? (
+          <MenuItem component={Link} to="/account">
+            <Typography textAlign="center">Account</Typography>
+          </MenuItem>
+        ) : (
+          <MenuItem component={Link} to="/signin">
+            <Typography textAlign="center">SignIn</Typography>
+          </MenuItem>
+        )}
+      </Toolbar>
+    </AppBar>
   );
 };
 
 {
-  /* <AppBar position="static">
-<Toolbar variant="dense">
-  <IconButton
-    edge="start"
-    color="inherit"
-    aria-label="menu"
-    sx={{ mr: 2 }}
-  ></IconButton>
-  <Typography variant="h4">Foodtography</Typography>
-
-  <MenuItem component={Link} to="/">
-    <Typography textAlign="center">Home</Typography>
-  </MenuItem>
-
-  <MenuItem component={Link} to="/login">
-    <Typography textAlign="center">Login</Typography>
-  </MenuItem>
-</Toolbar>
-</AppBar> */
+  /* <nav>
+<NavLink to="/">Foodtography</NavLink>
+{currentUser ? (
+  <NavLink to="/account">Account</NavLink>
+) : (
+  <NavLink to="/signin">Sign In</NavLink>
+)}
+</nav> */
 }
+
 export default NavBar;
