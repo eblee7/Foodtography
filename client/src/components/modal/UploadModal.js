@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ReactModal from "react-modal";
 import { useMutation } from "@apollo/client";
+import { useAuth } from "../../firebase/AuthContext";
 //Import the file where my query constants are defined
 import queries from "../../queries";
 
@@ -21,6 +22,7 @@ const customStyles = {
 };
 
 function UploadModal(props) {
+    const { currentUser } = useAuth();
     const [showhandleCloseUploadModal, setShowhandleCloseUploadModal] =
         useState(props.isOpen);
 
@@ -65,7 +67,6 @@ function UploadModal(props) {
     let body = null;
     let imageDescription;
     let file;
-    // let userName;
     body = (
         <form
             onSubmit={(e) => {
@@ -77,11 +78,10 @@ function UploadModal(props) {
                         food: food,
                         description: imageDescription.value,
                         rid: props.rid,
-                        userName: "Default value",
+                        userName: currentUser.email,
                     },
                 });
                 imageDescription.value = "";
-                // userName.value = "default";
                 setShowhandleCloseUploadModal(false);
                 alert("Image Added");
                 props.handleClose();

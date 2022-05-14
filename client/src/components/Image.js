@@ -2,8 +2,10 @@ import React from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { useParams } from "react-router-dom";
 import queries from "../queries";
+import { useAuth } from "../firebase/AuthContext";
 
 const Image = () => {
+    const { currentUser } = useAuth();
     const { id } = useParams();
     const { loading, error, data } = useQuery(queries.GET_IMAGE, {
         variables: { imageID: id },
@@ -15,6 +17,7 @@ const Image = () => {
                 variables: { imageID: id },
             });
             let comments = image.comments;
+            console.log(comments);
             cache.writeQuery({
                 query: queries.GET_IMAGE,
                 data: {
@@ -33,39 +36,42 @@ const Image = () => {
 
     if (data) {
         const { image } = data;
-        console.log(image);
         return (
             <div>
                 <img alt="temp" src={image.url} />
-                <form
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        addComment({
-                            variables: {
-                                userName: "1234",
-                                imageID: id,
-                                comment: comment.value,
-                            },
-                        });
-                        comment.value = "";
-                    }}
-                >
-                    <div>
-                        <label>
-                            Comment
-                            <br />
-                            <input
-                                ref={(node) => {
-                                    comment = node;
-                                }}
-                                required
-                            />
-                        </label>
-                    </div>
-                    <br />
+                {currentUser ? (
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            addComment({
+                                variables: {
+                                    userName: currentUser.userName,
+                                    imageID: id,
+                                    comment: comment.value,
+                                },
+                            });
+                            comment.value = "";
+                        }}
+                    >
+                        <div>
+                            <label>
+                                Comment
+                                <br />
+                                <input
+                                    ref={(node) => {
+                                        comment = node;
+                                    }}
+                                    required
+                                />
+                            </label>
+                        </div>
+                        <br />
 
-                    <button type="submit">Add Comment</button>
-                </form>
+                        <button type="submit">Add Comment</button>
+                    </form>
+                ) : (
+                    <h2>Sign in to comment</h2>
+                )}
                 {image.comments.map((comment) => {
                     return (
                         <>
