@@ -13,30 +13,8 @@
   }
 }
 
-.link-restyling {
-  text-decoration-style: none;
-}
-
-.flex-container {
-  display: flex;
-  justify-content: center;
-}
-
-.flex-item {
-  margin-right: 20px;
-}
-
-.container {
-  min-height: 10vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
 .App-header {
-  /* background-color: #282c34; */
+  background-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
