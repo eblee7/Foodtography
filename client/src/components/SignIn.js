@@ -1,15 +1,22 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Form, Button, Card, Alert } from "react-bootstrap";
+import React, { useState } from "react";
+import { Alert } from "react-bootstrap";
 import { useAuth } from "../firebase/AuthContext";
-import { Link, useNavigate } from "react-router-dom";
-import "./SignIn.css";
+import { Link, useNavigate, Navigate } from "react-router-dom";
+
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+
+import {
+    Avatar,
+    Button,
+    TextField,
+    Grid,
+    Box,
+    Typography,
+} from "@mui/material";
 
 const SignIn = () => {
-    const emailRef = useRef();
-    const passwordRef = useRef();
     const { login, signInWithGoogle, currentUser } = useAuth();
     const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     async function handleSubmit(e) {
@@ -17,75 +24,96 @@ const SignIn = () => {
 
         try {
             setError("");
-            setLoading(true);
-            await login(emailRef.current.value, passwordRef.current.value);
+            const data = new FormData(e.currentTarget);
+            await login(data.get("email"), data.get("password"));
             navigate("/account");
         } catch {
             setError("Failed to log in");
         }
-
-        setLoading(false);
     }
 
     async function signInUsingGoogleAccount() {
         try {
-            setLoading(true);
             await signInWithGoogle();
             navigate("/account");
         } catch {
             setError("Failed to create an account");
         }
     }
-
-    useEffect(() => {
-        if (currentUser) return navigate("/account");
-    }, [currentUser, navigate]);
+    if (currentUser) {
+        return <Navigate to="/account" />;
+    }
 
     return (
         <>
-            <Card>
-                <Card.Body>
-                    <h2 className="text-center mb-4">Log In</h2>
-                    {error && <Alert variant="danger">{error}</Alert>}
-                    <Form onSubmit={handleSubmit} className="login__container">
-                        <Form.Group id="email">
-                            <Form.Label>Email</Form.Label>
-                            <Form.Control
-                                type="email"
-                                ref={emailRef}
-                                required
-                            />
-                        </Form.Group>
-                        <Form.Group id="password">
-                            <Form.Label>Password</Form.Label>
-                            <Form.Control
-                                type="password"
-                                ref={passwordRef}
-                                required
-                            />
-                        </Form.Group>
-                        <Button
-                            disabled={loading}
-                            className="login__btn"
-                            type="submit"
-                        >
-                            Log In
-                        </Button>
-                        <Button
-                            className="login__btn login__google"
-                            onClick={signInUsingGoogleAccount}
-                        >
-                            Login with Google
-                        </Button>
-                    </Form>
-                    <div className="w-100 text-center mt-3">
-                        <Link to="/reset">Forgot Password?</Link>
-                    </div>
-                </Card.Body>
-            </Card>
-            <div className="w-100 text-center mt-2">
-                Don't have an account? <Link to="/signup">Register</Link>
-            </div>
+            <Box
+                sx={{
+                    marginTop: 8,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                }}
+            >
+                <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+                    <LockOutlinedIcon />
+                </Avatar>
+                <Typography component="h1" variant="h5">
+                    Sign in
+                </Typography>
+                {error && <Alert variant="danger">{error}</Alert>}
+                <Box
+                    component="form"
+                    onSubmit={handleSubmit}
+                    noValidate
+                    sx={{ mt: 1 }}
+                >
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="email"
+                        label="Email Address"
+                        name="email"
+                        autoComplete="email"
+                        autoFocus
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="password"
+                        label="Password"
+                        type="password"
+                        id="password"
+                        autoComplete="current-password"
+                    />
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 3, mb: 2 }}
+                    >
+                        Sign In
+                    </Button>
+                    <Button
+                        fullWidth
+                        variant="outline"
+                        onClick={signInUsingGoogleAccount}
+                    >
+                        Login with Google
+                    </Button>
+                    <Grid container>
+                        <Grid item xs>
+                            <Link to="/reset">Forgot Password?</Link>
+                        </Grid>
+                        <Grid item>
+                            <Link to="/signup">
+                                Don't have an account? Sign Up
+                            </Link>
+                        </Grid>
+                    </Grid>
+                </Box>
+            </Box>
         </>
     );
 };

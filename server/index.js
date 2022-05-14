@@ -8,6 +8,7 @@ const axios = require("axios");
 const AWS = require("aws-sdk");
 const im = require("imagemagick");
 const fs = require("fs");
+const xss = require("xss");
 require("dotenv").config();
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
@@ -26,73 +27,10 @@ const s3DefaultParams = {
         ["content-length-range", 0, 1024000], // 1 Mb
     ],
 };
-// const handleFileUpload = async (file) => {
-//     console.log(file, "file");
-//     const { createReadStream, filename } = await file;
-
-//     const key = uuid.v4();
-
-//     const stream = createReadStream();
-
-//     const out = require("fs").createWriteStream("images/local-file-output.jpg");
-
-//     stream.pipe(out);
-
-//     out.on("finish", () => {
-//         im.resize(
-//             {
-//                 srcPath: "images/local-file-output.jpg",
-//                 dstPath: "images/modified.jpg",
-//                 width: 256,
-//                 height: 256,
-//             },
-//             function (err, stdout, stderr) {
-//                 if (err) throw err;
-//                 return new Promise((resolve, reject) => {
-//                     s3.upload(
-//                         {
-//                             ...s3DefaultParams,
-//                             Body: fs.readFileSync("images/modified.jpg"),
-//                             Key: `images/${key}${filename}`,
-//                         },
-//                         (err, data) => {
-//                             if (err) {
-//                                 console.log("error uploading...", err);
-//                                 reject(err);
-//                             } else {
-//                                 console.log(
-//                                     "successfully uploaded file...",
-//                                     data
-//                                 );
-//                                 resolve(data);
-//                             }
-//                         }
-//                     );
-//                 });
-//             }
-//         );
-//     });
-
-//     const s3Params = {
-//         Bucket: process.env.S3_BUCKET_NAME,
-//         Key: key + filename,
-//         Expire: 60,
-//         ACL: "public-read",
-//     };
-
-//     const url = s3.getSignedUrl("getObject", s3Params);
-//     // const url = `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/images/${key}${filename}`;
-
-//     return url;
-// };
 
 //Some Mock Data
 const restaurantsCollection = mongoCollections.restaurants;
 const imagesCollection = mongoCollections.images;
-const usersCollection = mongoCollections.users;
-
-/* <input> location </input> -> shoot to mutation query -> places api (url+ location) return {lat: x lng: x} -> nearby api (url + lat + lng + type (restaurant )) return { restaurants}
--> sent to the front end and displayed  */
 
 const apiKey = process.env.GOOGLE_API_KEY;
 
@@ -105,12 +43,12 @@ const typeDefs = gql`
     }
 
     type Query {
-        users: [User]
         restaurantsNearby(address: String!): Nearby
         restaurant(rid: ID!): Restaurant
         restaurantImages(rid: ID!, food: Boolean!): [ImagePost]
         userImages(userID: ID!): [ImagePost]
         image(imageID: ID!): ImagePost
+        images: [ImagePost]
     }
 
     type ImagePost {
@@ -120,20 +58,13 @@ const typeDefs = gql`
         food: Boolean!
         rid: ID!
         userName: String!
+        userID: ID!
         comments: [Comment]
     }
 
     type Comment {
         userName: String!
         comment: String!
-    }
-
-    type User {
-        _id: ID!
-        userName: String!
-        password: String!
-        email: String!
-        posts: [ImagePost]
     }
 
     type Location {
@@ -173,8 +104,8 @@ const typeDefs = gql`
             description: String
             rid: ID!
             userName: String!
+            userID: ID!
         ): ImagePost
-        addUser(userName: String!, password: String!, email: String!): User
         addComment(userName: String!, imageID: ID!, comment: String!): Comment
     }
 `;
@@ -193,19 +124,15 @@ const typeDefs = gql`
 
 const resolvers = {
     Query: {
-        users: async () => {
-            const users = await usersCollection();
-            const allUsers = await users.find({}).toArray();
-            if (!allUsers) throw "Could not get all users";
-            return allUsers;
-        },
         restaurant: async (_, args) => {
-            let place_id = args.rid;
-            let exist = await client.existsAsync(args.rid + "Details");
+            let place_id = xss(args.rid);
+            if (!place_id || !place_id.trim()) throw "Invalid rid";
+
+            let exist = await client.existsAsync(place_id + "Details");
             if (exist) {
                 console.log("from redis");
                 let placeDetailsJSON = await client.getAsync(
-                    args.rid + "Details"
+                    place_id + "Details"
                 );
                 return JSON.parse(placeDetailsJSON);
             } else {
@@ -226,7 +153,7 @@ const resolvers = {
                         },
                     };
                     await client.setAsync(
-                        args.rid + "Details",
+                        place_id + "Details",
                         JSON.stringify(newRestaurant)
                     );
                     return newRestaurant;
@@ -239,29 +166,41 @@ const resolvers = {
             }
         },
         restaurantImages: async (_, args) => {
+            let rid = xss(args.rid);
+            let food = xss(args.food);
+            if (!rid || !rid.trim()) throw "Invalid rid";
+            food = food === "true" ? true : false;
             const images = await imagesCollection();
             const allimages = await images
-                .find({ rid: args.rid, food: args.food })
+                .find({ rid: rid, food: food })
                 .toArray();
             if (!allimages) throw "Could not get restaurant images";
             return allimages;
         },
-        userImages: async (_, args) => {
+        images: async (_, args) => {
             const images = await imagesCollection();
-            const allimages = await images
-                .find({ userID: args.userID })
-                .toArray();
+            const allimages = await images.find({}).toArray();
+            if (!allimages) throw "Could not get all images";
+            return allimages;
+        },
+        userImages: async (_, args) => {
+            let userID = xss(args.userID);
+            if (!userID || !userID.trim()) throw "Invalid userID";
+            const images = await imagesCollection();
+            const allimages = await images.find({ userID: userID }).toArray();
             if (!allimages) throw "Could not get user images";
 
             return allimages;
         },
         restaurantsNearby: async (_, args) => {
-            if (!args.address) {
+            let address = xss(args.address);
+            if (!address || !address.trim()) throw "Invalid address";
+            if (!address || !address.trim()) {
                 throw "No Address Provided";
             }
             var config = {
                 method: "get",
-                url: `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${args.address}&inputtype=textquery&fields=formatted_address%2Cplace_id%2Cname%2Cgeometry&key=${apiKey}`,
+                url: `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${address}&inputtype=textquery&fields=formatted_address%2Cplace_id%2Cname%2Cgeometry&key=${apiKey}`,
                 headers: {},
             };
             try {
@@ -272,12 +211,6 @@ const resolvers = {
                 }
                 let data = response.data.candidates[0];
                 let addressVicinity = data.formatted_address;
-
-                // let data = {
-                //     place_id: "ChIJTWpC695ZwokRloO5qV4pt1I",
-                // };
-                // let addressVicinity =
-                //     "1 Castle Point Terrace, Hoboken, NJ 07030, United States";
 
                 let exists = await client.existsAsync(data.place_id + "NearBy");
                 if (exists) {
@@ -344,14 +277,6 @@ const resolvers = {
                     );
                     return searchResults;
                 }
-
-                // copy data here when not using api
-
-                // let searchResults = {
-                //     address: addressVicinity,
-                //     nearest: data,
-                // };
-                // return searchResults;
             } catch (e) {
                 console.log(e);
                 throw {
@@ -360,41 +285,32 @@ const resolvers = {
             }
         },
         image: async (_, args) => {
-            // let exists = await client.existsAsync(args.imageID + "image");
-            // if (exists) {
-            //     let imageJSON = await client.getAsync(args.imageID + "image");
-            //     let image = JSON.parse(imageJSON);
-            //     return image;
-            // } else {
+            let imageID = xss(args.imageID);
+            if (!imageID || !imageID.trim()) throw "Invalid imageID";
             const images = await imagesCollection();
-            const image = await images.findOne({ _id: args.imageID });
+            const image = await images.findOne({ _id: imageID });
             if (image === null) {
                 throw "Image not found";
             }
-            // await client.setAsync(
-            //     args.imageID + "image",
-            //     JSON.stringify(image)
-            // );
             return image;
-            // }
         },
     },
     Mutation: {
-        addUser: async (_, args) => {
-            const users = await usersCollection();
-            const newUser = {
-                _id: uuid.v4(),
-                userName: args.userName,
-                password: args.password,
-                email: args.email,
-                posts: [],
-            };
-            const insertInfo = await users.insertOne(newUser);
-            if (!insertInfo.acknowledged || !insertInfo.insertedId)
-                throw "Could not add user";
-            return newUser;
-        },
         uploadImage: async (_, args) => {
+            let food = xss(args.food);
+            food = food === "true" ? true : false;
+            let description = xss(args.description);
+            let userName = xss(args.userName);
+            let userID = xss(args.userID);
+            let rid = xss(args.rid);
+
+            if (!description || !description.trim())
+                throw "Invalid description";
+            if (description.length > 140) throw "Description is too long";
+            if (!userName || !userName.trim()) throw "Invalid userName";
+            if (!userID || !userID.trim()) throw "Invalid userID";
+            if (!rid || !rid.trim()) throw "Invalid rid";
+
             const { createReadStream, filename } = await args.file;
 
             const key = uuid.v4();
@@ -402,7 +318,7 @@ const resolvers = {
             const stream = createReadStream();
 
             const out = require("fs").createWriteStream(
-                "images/local-file-output.jpg"
+                "local-file-output.jpg"
             );
 
             stream.pipe(out);
@@ -411,12 +327,11 @@ const resolvers = {
                 out.on("finish", () => {
                     resolve(
                         new Promise((resolve, reject) => {
-                            im.resize(
+                            im.crop(
                                 {
-                                    srcPath: "images/local-file-output.jpg",
-                                    dstPath: "images/modified.jpg",
-                                    width: 256,
-                                    height: 256,
+                                    srcPath: "local-file-output.jpg",
+                                    dstPath: "modified.jpg",
+                                    width: 500,
                                 },
                                 function (err, stdout, stderr) {
                                     if (err) reject(err);
@@ -426,7 +341,7 @@ const resolvers = {
                                                 {
                                                     ...s3DefaultParams,
                                                     Body: fs.readFileSync(
-                                                        "images/modified.jpg"
+                                                        "modified.jpg"
                                                     ),
                                                     Key: `images/${key}${filename}`,
                                                 },
@@ -442,18 +357,25 @@ const resolvers = {
                                                             "successfully uploaded file...",
                                                             data
                                                         );
+                                                        fs.unlinkSync(
+                                                            "modified.jpg"
+                                                        );
+                                                        fs.unlinkSync(
+                                                            "local-file-output.jpg"
+                                                        );
+
                                                         const images =
                                                             await imagesCollection();
 
                                                         const newImage = {
                                                             _id: uuid.v4(),
                                                             url: data.Location,
-                                                            food: args.food,
+                                                            food: food,
                                                             description:
-                                                                args.description,
-                                                            userName:
-                                                                args.userName,
-                                                            rid: args.rid,
+                                                                description,
+                                                            userName: userName,
+                                                            userID: userID,
+                                                            rid: rid,
                                                             comments: [],
                                                         };
                                                         console.log(newImage);
@@ -474,13 +396,20 @@ const resolvers = {
             });
         },
         addComment: async (_, args) => {
+            let userName = xss(args.userName);
+            let comment = xss(args.comment);
+            let imageID = xss(args.imageID);
+            if (!userName || !userName.trim()) throw "Invalid userName";
+            if (!comment || !comment.trim()) throw "Invalid comment";
+            if (comment.length > 140) throw "Comment is too long";
+            if (!imageID || !imageID.trim()) throw "Invalid imageID";
             const images = await imagesCollection();
             const newComment = {
-                userName: args.userName,
-                comment: args.comment,
+                userName: userName,
+                comment: comment,
             };
             const updatedInfo = await images.updateOne(
-                { _id: args.imageID },
+                { _id: imageID },
                 { $push: { comments: newComment } }
             );
             if (updatedInfo.modifiedCount === 0) {

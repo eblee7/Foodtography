@@ -1,64 +1,87 @@
-import React, { useRef, useState } from "react";
-import { Form, Button, Card, Alert } from "react-bootstrap";
+import React, { useState } from "react";
+import { Alert } from "react-bootstrap";
 import { useAuth } from "../firebase/AuthContext";
 import { Link } from "react-router-dom";
-import "./Reset.css";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import {
+    Avatar,
+    Button,
+    TextField,
+    Box,
+    Typography,
+    Grid,
+} from "@mui/material";
 
 function Reset() {
-    const emailRef = useRef();
     const { resetPassword } = useAuth();
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
-    const [loading, setLoading] = useState(false);
 
     async function handleSubmit(e) {
         e.preventDefault();
 
         try {
+            const data = new FormData(e.currentTarget);
             setMessage("");
             setError("");
-            setLoading(true);
-            await resetPassword(emailRef.current.value);
+            await resetPassword(data.get("email"));
             setMessage("Check your inbox for further instructions");
         } catch {
             setError("Failed to reset password");
         }
-
-        setLoading(false);
     }
 
     return (
         <>
-            <Card>
-                <Card.Body>
-                    <h2 className="text-center mb-4">Password Reset</h2>
-                    {error && <Alert variant="danger">{error}</Alert>}
-                    {message && <Alert variant="success">{message}</Alert>}
-                    <Form onSubmit={handleSubmit} className="reset__container">
-                        <Form.Group id="email">
-                            <Form.Label>Email</Form.Label>
-                            <Form.Control
-                                type="email"
-                                ref={emailRef}
-                                required
-                            />
-                        </Form.Group>
-                        <Button
-                            disabled={loading}
-                            className="reset__btn"
-                            type="submit"
-                        >
-                            Reset Password
-                        </Button>
-                    </Form>
-                    <div className="w-100 text-center mt-3">
-                        <Link to="/signin">Login</Link>
-                    </div>
-                </Card.Body>
-            </Card>
-            <div className="w-100 text-center mt-2">
-                Don't have an account? <Link to="/signup">Register</Link>
-            </div>
+            <Box
+                sx={{
+                    marginTop: 8,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                }}
+            >
+                <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+                    <LockOutlinedIcon />
+                </Avatar>
+                <Typography component="h1" variant="h5">
+                    Password Reset
+                </Typography>
+                {error && <Alert variant="danger">{error}</Alert>}
+                {message && <Alert variant="success">{message}</Alert>}
+                <Box
+                    component="form"
+                    onSubmit={handleSubmit}
+                    noValidate
+                    sx={{ mt: 1 }}
+                >
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="email"
+                        label="Email Address"
+                        name="email"
+                        autoComplete="email"
+                        autoFocus
+                    />
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 3, mb: 2 }}
+                    >
+                        Send Password Reset
+                    </Button>
+                    <Grid container>
+                        <Grid item xs>
+                            <Link to="/signup">
+                                Don't have an account? Register
+                            </Link>
+                        </Grid>
+                    </Grid>
+                </Box>
+            </Box>
         </>
     );
 }
