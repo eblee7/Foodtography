@@ -41,7 +41,7 @@ You may also see any lint errors in the console.
 
 
 ## Server
-In order to run the server, at latest any version Node version 12 must be used because of compatiblity issues of uploading to s3 with GraphQL.
+***Note: at latest any version Node version 12 must be used*** because of compatiblity issues of uploading to s3 with GraphQL.
 
 ***`.env` file must be in server directory*** in order to have access to the Google Places API calls.
 
