@@ -70,12 +70,11 @@ Set up [MongoDB](https://www.mongodb.com/docs/manual/tutorial/getting-started).
 2. To switch to Node Version 12 type  `nvm use 12` in your console
 3. To check for correct Node Version type `node -v` in your console 
 
-### `npm run seed`
-Seed the data into MongoDB.
-
-
 ### `npm install`
 Installs all the module dependencies for the server.
+
+### `npm run seed`
+Seed the data into MongoDB.
 
 ### `npm start`
 
