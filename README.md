@@ -16,7 +16,8 @@ This project was created with [React](https://github.com/facebook/create-react-a
 ## Client
 ***Note: Latest version of Node is not compatible with Client.***
 In order to avoid this issue [Install Node version 12](#how-to-install-node-version-12) in client console.
-***`.env` file must be in client directory*** in order to have access to the Fire base Authentication.***
+
+***`.env` file must be in client directory*** in order to have access to the Fire base Authentication.
 
 Technology used [React](https://github.com/facebook/create-react-app).
 
@@ -24,8 +25,9 @@ Technology used [React](https://github.com/facebook/create-react-app).
 1. `cd client`
 2. [Install Node version 12](#how-to-install-node-version-12)
 3. `npm install`
-4. `npm run seed`
-5. `npm start`
+4. `.env file exist in client directory`
+5. `npm run seed`
+6. `npm start`
 
 ### `npm install`
 Installs all the module dependencies for the client.
@@ -42,7 +44,7 @@ You may also see any lint errors in the console.
 ## Server
 In order to run the server, at latest any version Node version 12 must be used because of compatiblity issues of uploading to s3 with GraphQL.
 
-***`.env` file must be in server directory*** in order to have access to the Google Places API calls.***
+***`.env` file must be in server directory*** in order to have access to the Google Places API calls.
 
 Technologies used [Node.js](https://nodejs.org/en/docs/), [Redis](https://flaviocopes.com/redis-installation/), [MongoDB](https://www.mongodb.com/docs/manual/tutorial/getting-started/), [GraphQL](https://graphql.org/), [AWS](https://aws.amazon.com/), and [ImageMagick](https://imagemagick.org/index.php)
 
