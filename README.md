@@ -49,8 +49,8 @@ Technologies used [Node.js](https://nodejs.org/en/docs/), [Redis](https://flavio
 
 **Steps**
 1. `cd server`
-2.  [Set Up Redis](#redis)
-3.  [Set Up MongoDB](#mongodb)
+2.  [Set up Redis](#redis)
+3.  [Set up MongoDB](#mongodb)
 5. `.env file exist in server directory`
 6. [Install Node version 12](#how-to-install-node-version-12)
 7. `npm run seed`
