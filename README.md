@@ -5,7 +5,7 @@ Looking for places to eat is always a challenge, especially when traveling or vi
 FoodTography is a web appliciation focus on helping people find restaurants to eat at by using images that people post that highlights not just the food but their experience there. The application will allow users to search for restaurants at a certain location. Users can then select a restaurant to see posts based on the location's food or atmosphere, allowing users to get a better sense of the the overall atmosphere of the place. Users can posts and share images of experiences at restaurants. The posts will consist of the image of the restaurant, a description, and the location of the restaurant.
 
 
-This project was created with [React](https://github.com/facebook/create-react-app), [GraphQL](https://graphql.org/), [MongoDB](https://www.mongodb.com/), [Redis](https://redis.io/), [AWS](https://aws.amazon.com/), and [Google Places API](https://developers.google.com/maps/documentation/places/web-service/overview).
+This project was created with [React](https://github.com/facebook/create-react-app), [GraphQL](https://graphql.org/), [MongoDB](https://www.mongodb.com/), [Redis](https://redis.io/), [AWS](https://aws.amazon.com/), [ImageMagick](https://imagemagick.org/index.php), and [Google Places API](https://developers.google.com/maps/documentation/places/web-service/overview).
 
 
 ## How to Run
