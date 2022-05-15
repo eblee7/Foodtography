@@ -51,12 +51,15 @@ Technologies used [Node.js](https://nodejs.org/en/docs/), [Redis](https://flavio
 1. `cd server`
 2.  [Set up Redis](#redis)
 3.  [Set up MongoDB](#mongodb)
+4.  [Install Imagemagick](#imagemagick)
 5. `.env file exist in server directory`
 6. [Install Node version 12](#how-to-install-node-version-12)
 7. `npm run seed`
 8. `npm install`
 
 ### `Imagemagick`
+Install [Imagemagic](https://imagemagick.org/script/download.php).
+
 If on a windows machine, imagemagick module has a known bug which makes it unable to read the PATH variable from ENVIRONMENT. In order to resolve this issue manually set the path to default windows location. If it throws Error: spawn identify ENOENT then you may have to set the correct location to `convert.exe` and `identify.exe` binaries which is relative to your machine in `./server/index.js` file
 
 ### `Redis`
