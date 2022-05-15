@@ -57,10 +57,10 @@ Technologies used [Node.js](https://nodejs.org/en/docs/), [Redis](https://flavio
 7. `npm install`
 
 ### `Redis`
-Set up [Redis](https://flaviocopes.com/redis-installation/)
+Set up [Redis](https://flaviocopes.com/redis-installation/).
 
 ### `MongoDB`
-Set up [MongoDB](https://www.mongodb.com/docs/manual/tutorial/getting-started)
+Set up [MongoDB](https://www.mongodb.com/docs/manual/tutorial/getting-started).
 
 ### `npm run seed`
 Seed the data into MongoDB.
