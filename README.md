@@ -26,7 +26,6 @@ Technology used [React](https://github.com/facebook/create-react-app).
 2. [Install Node version 12](#how-to-install-node-version-12)
 3. `.env file exist in client directory`
 4. `npm install`
-5. `npm run seed`
 6. `npm start`
 
 ### `npm install`
