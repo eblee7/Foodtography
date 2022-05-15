@@ -60,10 +60,10 @@ Technologies used [Node.js](https://nodejs.org/en/docs/), [Redis](https://flavio
 If on a windows machine, imagemagick module has a known bug which makes it unable to read the PATH variable from ENVIRONMENT. In order to resolve this issue manually set the path to default windows location. If it throws Error: spawn identify ENOENT then you may have to set the correct location to `convert.exe` and `identify.exe` binaries which is relative to your machine in `./server/index.js` file
 
 ### `Redis`
-Set up [Redis](https://flaviocopes.com/redis-installation/).
+Set up and run [Redis](https://flaviocopes.com/redis-installation/).
 
 ### `MongoDB`
-Set up [MongoDB](https://www.mongodb.com/docs/manual/tutorial/getting-started).
+Set up and run [MongoDB](https://www.mongodb.com/docs/manual/tutorial/getting-started).
 
 ### `npm install`
 Installs all the module dependencies for the server.
