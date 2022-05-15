@@ -45,7 +45,7 @@ You may also see any lint errors in the console.
 
 ***`.env` file must be in server directory*** in order to have access to the Google Places API calls.
 
-Technologies used [Node.js](https://nodejs.org/en/docs/), [Redis](https://flaviocopes.com/redis-installation/), [MongoDB](https://www.mongodb.com/docs/manual/tutorial/getting-started/), [GraphQL](https://graphql.org/), [AWS](https://aws.amazon.com/), and [ImageMagick](https://imagemagick.org/index.php)
+Technologies used [Node.js](https://nodejs.org/en/docs/), [Redis](https://flaviocopes.com/redis-installation/), [MongoDB](https://www.mongodb.com/docs/manual/tutorial/getting-started/), [GraphQL](https://graphql.org/), [AWS](https://aws.amazon.com/), and [ImageMagick](https://imagemagick.org/index.php).
 
 **Steps**
 1. `cd server`
