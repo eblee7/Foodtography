@@ -56,22 +56,22 @@ Technologies used [Node.js](https://nodejs.org/en/docs/), [Redis](https://flavio
 7. `npm run seed`
 8. `npm install`
 
+### `Imagemagick`
+If on a windows machine, imagemagick module has a known bug which makes it unable to read the PATH variable from ENVIRONMENT. In order to resolve this issue manually set the path to default windows location. If it throws Error: spawn identify ENOENT then you may have to set the correct location to `convert.exe` and `identify.exe` binaries which is relative to your machine in `./server/index.js` file
+
 ### `Redis`
 Set up [Redis](https://flaviocopes.com/redis-installation/).
 
 ### `MongoDB`
 Set up [MongoDB](https://www.mongodb.com/docs/manual/tutorial/getting-started).
 
-### `npm run seed`
-Seed the data into MongoDB.
-
-### `Imagemagick`
-If on a windows machine, imagemagick module has a known bug which makes it unable to read the PATH variable from ENVIRONMENT. In order to resolve this issue manually set the path to default windows location. If it throws Error: spawn identify ENOENT then you may have to set the correct location to `convert.exe` and `identify.exe` binaries which is relative to your machine in `./server/index.js` file
-
 ### `How to Install Node Version 12`
 1. To install Node Version 12, install [nvm](https://github.com/nvm-sh/nvm)
 2. To switch to Node Version 12 type  `nvm use 12` in your console
 3. To check for correct Node Version type `node -v` in your console 
+
+### `npm run seed`
+Seed the data into MongoDB.
 
 
 ### `npm install`
