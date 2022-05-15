@@ -49,13 +49,13 @@ Technologies used [Node.js](https://nodejs.org/en/docs/), [Redis](https://flavio
 
 **Steps**
 1. `cd server`
-2.  [Set up Redis](#redis)
-3.  [Set up MongoDB](#mongodb)
-4.  [Install Imagemagick](#imagemagick)
-5. `.env file exist in server directory`
-6. [Install Node version 12](#how-to-install-node-version-12)
-7. `npm run seed`
-8. `npm install`
+2. [Install Imagemagick](#imagemagick)
+3. [Set up Redis](#redis)
+4. [Set up MongoDB](#mongodb)
+6. `.env file exist in server directory`
+7. [Install Node version 12](#how-to-install-node-version-12)
+8. `npm run seed`
+9. `npm install`
 
 ### `Imagemagick`
 Install [Imagemagic](https://imagemagick.org/script/download.php).
