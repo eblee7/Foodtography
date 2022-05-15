@@ -65,11 +65,6 @@ Set up [Redis](https://flaviocopes.com/redis-installation/).
 ### `MongoDB`
 Set up [MongoDB](https://www.mongodb.com/docs/manual/tutorial/getting-started).
 
-### `How to Install Node Version 12`
-1. To install Node Version 12, install [nvm](https://github.com/nvm-sh/nvm)
-2. To switch to Node Version 12 type  `nvm use 12` in your console
-3. To check for correct Node Version type `node -v` in your console 
-
 ### `npm install`
 Installs all the module dependencies for the server.
 
@@ -80,6 +75,11 @@ Seed the data into MongoDB.
 
 Starts the Server.\
 Open [http://localhost:4000](http://localhost:4000) to view GraphQL in your browser.
+
+## How to Install Node Version 12
+1. To install Node Version 12, install [nvm](https://github.com/nvm-sh/nvm)
+2. To switch to Node Version 12 type  `nvm use 12` in your console
+3. To check for correct Node Version type `node -v` in your console 
 
 
 
