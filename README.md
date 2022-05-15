@@ -16,11 +16,12 @@ This project was created with [React](https://github.com/facebook/create-react-a
 ## Client
 ***Note: Latest version of Node is not compatible with Client.***
 In order to avoid this issue [Install Node version 12](#how-to-install-node-version-12) in client console.
+***`.env` file must be in client directory*** in order to have access to the Fire base Authentication.***
 
 Technology used [React](https://github.com/facebook/create-react-app).
 
 **Steps**
-1. `cd ~/Foodtography/client`
+1. `cd client`
 2. [Install Node version 12](#how-to-install-node-version-12)
 3. `npm install`
 4. `npm run seed`
@@ -28,9 +29,6 @@ Technology used [React](https://github.com/facebook/create-react-app).
 
 ### `npm install`
 Installs all the module dependencies for the client.
-
-### `npm run seed`
-Seed the data into MongoDB.
 
 ### `npm start`
 
@@ -44,17 +42,18 @@ You may also see any lint errors in the console.
 ## Server
 In order to run the server, at latest any version Node version 12 must be used because of compatiblity issues of uploading to s3 with GraphQL.
 
-***`.env` file must be in server directory*** in order to have access to the Google Places API calls and Firebase Authentication. 
+***`.env` file must be in server directory*** in order to have access to the Google Places API calls.***
 
 Technologies used [Node.js](https://nodejs.org/en/docs/), [Redis](https://flaviocopes.com/redis-installation/), [MongoDB](https://www.mongodb.com/docs/manual/tutorial/getting-started/), [GraphQL](https://graphql.org/), [AWS](https://aws.amazon.com/), and [ImageMagick](https://imagemagick.org/index.php)
 
 **Steps**
-1. `cd ~/Foodtography/client`
+1. `cd server`
 2.  [Set Up Redis](#redis)
 3.  [Set Up MongoDB](#mongodb)
-4. `.env file exist in server directory`
-5. [Install Node version 12](#how-to-install-node-version-12)
-6. `npm install`
+4.  `npm run seed`
+5. `.env file exist in server directory`
+6. [Install Node version 12](#how-to-install-node-version-12)
+7. `npm install`
 
 ### `Redis`
 Set up [Redis](https://flaviocopes.com/redis-installation/)
@@ -62,8 +61,11 @@ Set up [Redis](https://flaviocopes.com/redis-installation/)
 ### `MongoDB`
 Set up [MongoDB](https://www.mongodb.com/docs/manual/tutorial/getting-started)
 
+### `npm run seed`
+Seed the data into MongoDB.
+
 ### `Imagemagick`
-If on a windows machine, imagemagick module has a known bug which makes it unable to read the PATH variable from ENVIRONMENT. In order to resolve this issue manually set the path to default windows location. If it throws Error: spawn identify ENOENT then you may have to set the correct location to `convert.exe` and `identify.exe` binaries which is relative to your machine in `./server/routes/photo.js` file
+If on a windows machine, imagemagick module has a known bug which makes it unable to read the PATH variable from ENVIRONMENT. In order to resolve this issue manually set the path to default windows location. If it throws Error: spawn identify ENOENT then you may have to set the correct location to `convert.exe` and `identify.exe` binaries which is relative to your machine in `./server/index.js` file
 
 ### `How to Install Node Version 12`
 1. To install Node Version 12, install [nvm](https://github.com/nvm-sh/nvm)
@@ -77,7 +79,7 @@ Installs all the module dependencies for the server.
 ### `npm start`
 
 Starts the Server.\
-Open [http://localhost:400](http://localhost:4000) to view GraphQL in your browser.
+Open [http://localhost:4000](http://localhost:4000) to view GraphQL in your browser.
 
 
 
