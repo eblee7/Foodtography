@@ -14,6 +14,11 @@ require("dotenv").config();
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 
+if (process.platform == "win32") {
+    im.convert.path = "C:/Program Files/ImageMagick-7.1.0-Q16-HDRI/convert";
+    im.identify.path = "C:/Program Files/ImageMagick-7.1.0-Q16-HDRI/identify";
+}
+
 AWS.config.update({
     accessKeyId: process.env.AWS_ACCESS_ID,
     secretAccessKey: process.env.AWS_SECRET_KEY,
