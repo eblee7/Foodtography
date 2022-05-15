@@ -49,7 +49,7 @@ Technologies used [Node.js](https://nodejs.org/en/docs/), [Redis](https://flavio
 
 **Steps**
 1. `cd server`
-2. [Install Imagemagick](#imagemagick)
+2. [Install ImageMagick](#imagemagick)
 3. [Set up Redis](#redis)
 4. [Set up MongoDB](#mongodb)
 6. `.env file exist in server directory`
@@ -57,8 +57,8 @@ Technologies used [Node.js](https://nodejs.org/en/docs/), [Redis](https://flavio
 8. `npm run seed`
 9. `npm install`
 
-### `Imagemagick`
-Install [Imagemagic](https://imagemagick.org/script/download.php).
+### `ImageMagick`
+Install [ImageMagick](https://imagemagick.org/script/download.php).
 
 If on a windows machine, imagemagick module has a known bug which makes it unable to read the PATH variable from ENVIRONMENT. In order to resolve this issue manually set the path to default windows location. If it throws Error: spawn identify ENOENT then you may have to set the correct location to `convert.exe` and `identify.exe` binaries which is relative to your machine in `./server/index.js` file
 
