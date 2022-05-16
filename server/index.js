@@ -384,9 +384,17 @@ const resolvers = {
                                                             comments: [],
                                                         };
                                                         console.log(newImage);
-                                                        await images.insertOne(
-                                                            newImage
-                                                        );
+                                                        const insertInfo =
+                                                            await images.insertOne(
+                                                                newImage
+                                                            );
+                                                        if (
+                                                            !insertInfo.acknowledged ||
+                                                            !insertInfo.insertedId
+                                                        )
+                                                            reject(
+                                                                "Could not add image"
+                                                            );
                                                         resolve(newImage);
                                                     }
                                                 }

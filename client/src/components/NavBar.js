@@ -20,7 +20,7 @@ const NavBar = () => {
                     aria-label="menu"
                     sx={{ mr: 2 }}
                 ></IconButton>
-                <Typography variant="h4">Foodtography</Typography>
+                <Typography sx={{ fontSize: 35 }}>Foodtography</Typography>
 
                 <MenuItem component={Link} to="/">
                     <Typography textAlign="center">Home</Typography>
