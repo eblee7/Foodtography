@@ -388,13 +388,6 @@ const resolvers = {
                                                             await images.insertOne(
                                                                 newImage
                                                             );
-                                                        if (
-                                                            !insertInfo.acknowledged ||
-                                                            !insertInfo.insertedId
-                                                        )
-                                                            reject(
-                                                                "Could not add image"
-                                                            );
                                                         resolve(newImage);
                                                     }
                                                 }
